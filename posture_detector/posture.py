@@ -78,7 +78,7 @@ class PostureWatcher:
 
     def set_base_posture(self):
         _, img = self.cap.read()
-        _, lm = self.detector.find_pose(img)
+        _,lm = self.detector.find_pose(img)
         if lm:
             nose = lm[PoseLandmarks.NOSE]
             mouth_l = lm[9]
@@ -148,9 +148,9 @@ class PostureWatcher:
         if self.deviation.has_deviated():
             self.logger.notify(f"Detected deviation from base posture by {cd}%", color='red', with_sound=True)
         else:
-            if cd < 35:
+            if cd < 30:
                 self.logger.notify(f"✅ Great posture! {cd}% (Buf: {buffer})", color='green')
-            elif cd < 45:
+            elif cd < 40:
                 self.logger.notify(f"⚠️ Improve your posture! {cd}% (Buf: {buffer})", color='yellow')
             else:
                 self.logger.notify(f"️ Fix your posture! {cd}% (Buf: {buffer})", color='red')

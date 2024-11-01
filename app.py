@@ -1,97 +1,52 @@
 import cv2
 import mediapipe as mp
-from PySide6.QtWidgets import QApplication, QLabel, QPushButton, QVBoxLayout, QWidget
-from PySide6.QtCore import QTimer
-from PySide6.QtGui import QImage, QPixmap
 
-# Initialize Mediapipe Pose model
+# Initialize Mediapipe Pose module
 mp_pose = mp.solutions.pose
-pose = mp_pose.Pose()
+pose = mp_pose.Pose(static_image_mode=False, min_detection_confidence=0.5)
 
-class PostureDetectorApp(QWidget):
-    def __init__(self):
-        super().__init__()
+# Initialize Mediapipe drawing module
+mp_drawing = mp.solutions.drawing_utils
 
-        # UI Elements
-        self.video_label = QLabel()
-        self.status_label = QLabel("Posture: Unknown")
-        self.start_button = QPushButton("Start")
-        self.stop_button = QPushButton("Stop")
-        self.start_button.clicked.connect(self.start_webcam)
-        self.stop_button.clicked.connect(self.stop_webcam)
+def main():
+    cap = cv2.VideoCapture(0)  # Open the camera
 
-        # Layout
-        layout = QVBoxLayout()
-        layout.addWidget(self.video_label)
-        layout.addWidget(self.status_label)
-        layout.addWidget(self.start_button)
-        layout.addWidget(self.stop_button)
-        self.setLayout(layout)
+    if not cap.isOpened():
+        print("Error: Could not open video.")
+        return
 
-        # Timer for capturing video frames
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update_frame)
+    while True:
+        success, image = cap.read()  # Read a frame from the camera
+        if not success:
+            print("Error: Could not read frame.")
+            break
 
-        # Webcam feed
-        self.cap = None
+        # Convert the BGR image to RGB
+        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-    def start_webcam(self):
-        self.cap = cv2.VideoCapture(0)
-        self.timer.start(20)  # Update every 20 ms
+        # Process the image and find pose landmarks
+        results = pose.process(image_rgb)
 
-    def stop_webcam(self):
-        self.timer.stop()
-        if self.cap:
-            self.cap.release()
-        self.video_label.clear()
-
-    def update_frame(self):
-        ret, frame = self.cap.read()
-        if not ret:
-            return
-
-        # Convert the image to RGB (from BGR)
-        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-        # Detect posture using Mediapipe
-        results = pose.process(rgb_frame)
-
-        # Draw landmarks on the frame
+        # Draw landmarks on the image
         if results.pose_landmarks:
-            self.check_posture(results.pose_landmarks)
-            mp.solutions.drawing_utils.draw_landmarks(rgb_frame, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
+            mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
 
-        # Convert image to Qt format and display
-        qt_img = self.convert_cv_qt(rgb_frame)
-        self.video_label.setPixmap(qt_img)
+            # Print landmark coordinates to the console
+            print("Landmarks:")
+            for id, lm in enumerate(results.pose_landmarks.landmark):
+                pass
+                # print(f"Landmark {id}: (x: {lm.x}, y: {lm.y}, z: {lm.z})")
 
-    def check_posture(self, landmarks):
-        # Extract key landmarks
-        nose = landmarks.landmark[mp_pose.PoseLandmark.NOSE]
-        left_ear = landmarks.landmark[mp_pose.PoseLandmark.LEFT_EAR]
-        right_ear = landmarks.landmark[mp_pose.PoseLandmark.RIGHT_EAR]
-        left_shoulder = landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER]
-        right_shoulder = landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER]
+        # Show the image with landmarks
+        cv2.imshow('Pose Detection', image)
 
-        # Analyze vertical and horizontal alignment
-        face_alignment = (nose.y - (left_shoulder.y + right_shoulder.y) / 2)  # Face to shoulders alignment
-        ear_alignment = abs(left_ear.y - left_shoulder.y) + abs(right_ear.y - right_shoulder.y)  # Ears to shoulders
+        # Break the loop on 'q' key press
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
-        # Set posture status based on analysis
-        if face_alignment < 0.1 and ear_alignment < 0.1:
-            self.status_label.setText("Posture: Good")
-        else:
-            self.status_label.setText("Posture: Bad")
-
-    def convert_cv_qt(self, cv_img):
-        """Convert from an OpenCV image (RGB) to QPixmap (for Qt display)."""
-        h, w, ch = cv_img.shape
-        bytes_per_line = ch * w
-        convert_to_Qt_format = QImage(cv_img.data, w, h, bytes_per_line, QImage.Format_RGB888)
-        return QPixmap.fromImage(convert_to_Qt_format)
+    # Release the camera and close windows
+    cap.release()
+    cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    app = QApplication([])
-    window = PostureDetectorApp()
-    window.show()
-    app.exec()
+    main()

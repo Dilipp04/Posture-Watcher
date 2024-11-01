@@ -1,6 +1,6 @@
 import sys
 from PySide6.QtWidgets import QApplication
-from ui.ui import PostureWatcherUI
+from ui.mainWindow import PostureWatcherUI
 
 def main():
     app = QApplication(sys.argv)
