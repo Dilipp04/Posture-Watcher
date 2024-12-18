@@ -120,7 +120,6 @@ class CameraViewTab(QWidget):
         # Stop the posture watcher and release the resources
         self.frame_timer.stop()
         self.elapsed_time_timer.stop()  # Stop the elapsed time timer
-        self.posture_watcher.stop()
         self.status_label.setText("Monitoring stopped.")
 
     def set_base_posture(self):

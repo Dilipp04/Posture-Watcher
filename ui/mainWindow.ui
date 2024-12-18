@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PostureApp</class>
+ <widget class="QWidget" name="PostureApp">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>PostureWatcher</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="tabPosition">
+      <enum>QTabWidget::North</enum>
+     </property>
+     <property name="tabShape">
+      <enum>QTabWidget::Rounded</enum>
+     </property>
+     <widget class="QWidget" name="dashboardTab">
+      <attribute name="title">
+       <string>Dashboard</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="dashboardLayout">
+       <item>
+        <widget class="QLabel" name="dashboardTitle">
+         <property name="text">
+          <string>Dashboard Overview</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="styleSheet">
+          <string>
+           QLabel {
+               font-size: 24px;
+               font-weight: bold;
+               margin: 10px;
+           }
+          </string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="videoFeed">
+         <property name="text">
+          <string>[Video Feed Placeholder]</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="styleSheet">
+          <string>
+           QLabel {
+               background-color: #e0e0e0;
+               border: 1px solid #ccc;
+               min-height: 300px;
+           }
+          </string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="statusLabel">
+         <property name="text">
+          <string>Status: Good Posture</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="styleSheet">
+          <string>
+           QLabel {
+               font-size: 16px;
+               color: green;
+               margin: 10px;
+           }
+          </string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="buttonLayout">
+         <item>
+          <widget class="QPushButton" name="startButton">
+           <property name="text">
+            <string>Start</string>
+           </property>
+           <property name="styleSheet">
+            <string>
+             QPushButton {
+                 background-color: #4CAF50;
+                 color: white;
+                 padding: 10px;
+                 font-size: 14px;
+             }
+             QPushButton:hover {
+                 background-color: #45a049;
+             }
+            </string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="stopButton">
+           <property name="text">
+            <string>Stop</string>
+           </property>
+           <property name="styleSheet">
+            <string>
+             QPushButton {
+                 background-color: #f44336;
+                 color: white;
+                 padding: 10px;
+                 font-size: 14px;
+             }
+             QPushButton:hover {
+                 background-color: #e53935;
+             }
+            </string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="settingsTab">
+      <attribute name="title">
+       <string>Settings</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="settingsLayout">
+       <item>
+        <widget class="QLabel" name="settingsTitle">
+         <property name="text">
+          <string>Application Settings</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="styleSheet">
+          <string>
+           QLabel {
+               font-size: 24px;
+               font-weight: bold;
+               margin: 10px;
+           }
+          </string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="saveSettingsButton">
+         <property name="text">
+          <string>Save Settings</string>
+         </property>
+         <property name="styleSheet">
+          <string>
+           QPushButton {
+               background-color: #007BFF;
+               color: white;
+               padding: 10px;
+               font-size: 14px;
+           }
+           QPushButton:hover {
+               background-color: #0056b3;
+           }
+          </string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

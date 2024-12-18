@@ -14,13 +14,7 @@ A desktop application that uses Mediapipe for real-time posture detection and Py
 
 Run the main script:
 
-````bash
+```bash
 python src/main.py
 
-### Running the Application
-
-To run the application, navigate to the `src` directory and execute:
-
-```bash
-python main.py
-````
+```
