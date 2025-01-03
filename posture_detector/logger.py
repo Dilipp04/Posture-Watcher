@@ -1,6 +1,5 @@
 from os import system, name
 from threading import Lock
-from termcolor import colored
 import time
 import winsound
 

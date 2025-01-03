@@ -15,7 +15,7 @@ class PostureAnalyzer:
         self.pose = self.mp_pose.Pose()
         self.cap = None
 
-    def start_camera(self, camera_index=1):
+    def start_camera(self, camera_index=0):
         self.cap = cv2.VideoCapture(camera_index)
         if not self.cap.isOpened():
             raise Exception("Error: Cannot access the webcam.")
@@ -91,7 +91,7 @@ class PostureAnalyzer:
 class PostureApp(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowFlag(Qt.FramelessWindowHint)  # No border
+        # self.setWindowFlag(Qt.FramelessWindowHint)  # No border
 
         self.posture_analyzer = PostureAnalyzer()
         self.timer = QTimer()

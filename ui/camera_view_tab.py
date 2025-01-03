@@ -47,7 +47,7 @@ class CameraViewTab(QWidget):
         # Example button style code
         self.start_button.setStyleSheet("""
             QPushButton {
-                background-color: #FB9224;  /* Gold color */
+                background-color: #012E54;  /* Gold color */
                 border: none;                /* No border */
                 border-radius: 8px;         /* Rounded corners */
                 padding: 10px 20px;         /* Padding for better size */
@@ -62,7 +62,7 @@ class CameraViewTab(QWidget):
         self.stop_button = QPushButton("Stop", self)
         self.stop_button.setStyleSheet("""
             QPushButton {
-                background-color: #FB9224;  /* Gold color */
+                background-color: #012E54;  /* Gold color */
                 border: none;                /* No border */
                 border-radius: 8px;         /* Rounded corners */
                 padding: 10px 20px;         /* Padding for better size */
@@ -77,7 +77,7 @@ class CameraViewTab(QWidget):
         self.set_base_button = QPushButton("Set Base Posture", self)
         self.set_base_button.setStyleSheet("""
             QPushButton {
-                background-color: #FB9224;  /* Gold color */
+                background-color: #012E54;  /* Gold color */
                 border: none;                /* No border */
                 border-radius: 8px;         /* Rounded corners */
                 padding: 10px 20px;         /* Padding for better size */
