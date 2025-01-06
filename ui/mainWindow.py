@@ -1,8 +1,8 @@
 import sys
 from PySide6.QtWidgets import QApplication, QWidget, QHBoxLayout, QListWidget, QStackedWidget
-from ui.dashboard_tab import DashboardTab
-from ui.settings_tab import SettingsTab
-from ui.camera_view_tab import CameraViewTab
+from ui.dashboard import Dashboard
+from ui.settings import Settings
+from ui.home import CameraViewTab
 
 class PostureWatcherUI(QWidget):
     def __init__(self):
@@ -25,8 +25,8 @@ class PostureWatcherUI(QWidget):
 
         # Create tabs
         self.camera_view_tab = CameraViewTab()
-        self.dashboard_tab = DashboardTab()
-        self.settings_tab = SettingsTab()
+        self.dashboard_tab = Dashboard()
+        self.settings_tab = Settings()
 
         # Add tabs to stacked widget
         self.stacked_widget.addWidget(self.camera_view_tab)

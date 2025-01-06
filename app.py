@@ -4,7 +4,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QFont, QPixmap, QColor,QIcon
 from PySide6.QtCore import Qt, QTimer, QTime
 import sys
-from test import SettingsUI
+from test import Settings
 
 class PostureApp(QMainWindow):
     def __init__(self):
@@ -139,7 +139,7 @@ class PostureApp(QMainWindow):
         label.setStyleSheet("font-size: 24px; color: #333;")
         settings_layout.addWidget(label)
 
-        self.content_area.addWidget(SettingsUI())
+        self.content_area.addWidget(Settings())
 
 
 

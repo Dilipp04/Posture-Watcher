@@ -1,23 +1,16 @@
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QComboBox, QCheckBox,
-    QHBoxLayout, QPushButton, QButtonGroup
+    QHBoxLayout, QPushButton, QButtonGroup ,QFrame
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt 
 from PySide6.QtGui import QFont
 
 
-class Settings(QMainWindow):
+class Settings(QFrame):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Settings")
-        self.setGeometry(200, 200, 600, 400)
-
-        # Main Widget
-        main_widget = QWidget()
-        self.setCentralWidget(main_widget)
-
         # Main Layout
-        main_layout = QVBoxLayout(main_widget)
+        main_layout = QVBoxLayout(self)
         main_layout.setSpacing(20)
 
         # Settings Title
@@ -141,8 +134,8 @@ class Settings(QMainWindow):
         return toggle
 
 
-if __name__ == "__main__":
-    app = QApplication([])
-    window = Settings()
-    window.show()
-    app.exec()
+# if __name__ == "__main__":
+#     app = QApplication([])
+#     window = Settings()
+#     window.show()
+#     app.exec()
