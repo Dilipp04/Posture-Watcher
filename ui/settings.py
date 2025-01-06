@@ -10,6 +10,7 @@ class Settings(QFrame):
     def __init__(self):
         super().__init__()
         # Main Layout
+        self.setStyleSheet("background-color:white;color:black")
         main_layout = QVBoxLayout(self)
         main_layout.setSpacing(20)
 
@@ -134,8 +135,8 @@ class Settings(QFrame):
         return toggle
 
 
-# if __name__ == "__main__":
-#     app = QApplication([])
-#     window = Settings()
-#     window.show()
-#     app.exec()
+if __name__ == "__main__":
+    app = QApplication([])
+    window = Settings()
+    window.show()
+    app.exec()

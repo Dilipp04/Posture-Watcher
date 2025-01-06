@@ -1,10 +1,10 @@
 import cv2
 from PySide6.QtCore import QTimer, Qt
 from PySide6.QtGui import QImage, QPixmap
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout
-from posture_detector.posture import PostureWatcher  # Assuming PostureWatcher from previous code
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout,QFrame
+from posture_detector import PostureWatcher  # Assuming PostureWatcher from previous code
 
-class CameraViewTab(QWidget):
+class Home(QFrame):
     def __init__(self):
         super().__init__()
 

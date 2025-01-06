@@ -15,8 +15,8 @@ class Dashboard(QFrame):
         label.setStyleSheet("font-size: 60px; color: #013e54;")
         layout.addWidget(label)
 
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)
-#     window = Dashboard()
-#     window.show()
-#     sys.exit(app.exec())
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = Dashboard()
+    window.show()
+    sys.exit(app.exec())
