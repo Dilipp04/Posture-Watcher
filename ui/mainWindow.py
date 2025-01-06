@@ -40,7 +40,7 @@ class PostureWatcherUI(QWidget):
 
         self.setLayout(layout)
         self.setWindowTitle("Posture Watcher")
-        # self.resize(1024, 768)
+        self.resize(1024, 768)
 
     def display_tab(self, index):
         # Change the displayed tab when the user clicks a different item in the sidebar

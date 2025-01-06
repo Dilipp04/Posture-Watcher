@@ -1,8 +1,8 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar, QFrame, QHBoxLayout
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar, QFrame, QHBoxLayout , QApplication
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
-
-class DashboardTab(QWidget):
+import sys
+class DashboardTab(QFrame):
     def __init__(self):
         super().__init__()
 
@@ -86,3 +86,9 @@ class DashboardTab(QWidget):
             card_layout.addWidget(extra_label)
 
         return card
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = DashboardTab()
+    window.show()
+    sys.exit(app.exec())

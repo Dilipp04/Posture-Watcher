@@ -1,7 +1,4 @@
-import sys
-import time
 import cv2
-import csv
 from PySide6.QtCore import QTimer, Qt
 from PySide6.QtGui import QImage, QPixmap
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout
@@ -125,7 +122,7 @@ class CameraViewTab(QWidget):
     def set_base_posture(self):
         # Capture base posture for comparison
         self.posture_watcher.set_base_posture()
-        self.status_label.setText("Base posture set.")
+        self.status_label.setText("Base posture set")
 
     def update_elapsed_time(self):
         # Update the elapsed time and display it in the timer label

@@ -2,7 +2,7 @@ from os import system, name
 from threading import Lock
 import time
 import winsound
-
+from termcolor import colored
 class Logger:
     """
     A simpler logger class.

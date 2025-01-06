@@ -168,5 +168,5 @@ class PostureWatcher:
         cd = self.deviation.current_deviation
         buffer = self.deviation.current_buffer
 
-        self._log_deviation(cd, buffer)
+        # self._log_deviation(cd, buffer)
 
