@@ -24,7 +24,7 @@ class PostureWatcherUI(QWidget):
 
         # Content area with stacked widget
         self.content_area = QStackedWidget()
-        self.content_area.setStyleSheet("background-color: white;")
+        self.content_area.setStyleSheet("background-color: white;border-radius: 10px;")
         main_layout.addWidget(self.content_area, 10)
 
         # Create tabs
@@ -57,37 +57,57 @@ class PostureWatcherUI(QWidget):
             ("Settings", "assets/settings_icon.svg")
         ]
         self.nav_button_dict = {}
-        for text, icon_path in nav_buttons:
+
+        # Active and inactive styles
+        active_style = """
+            QPushButton {
+                color: white;
+                background-color: #005f73;
+                font-size: 15px;
+                text-align: left;
+                border-radius: 8px;
+                padding: 10px 20px;
+            }
+        """
+        inactive_style = """
+            QPushButton {
+                color: white;
+                border: none;
+                font-size: 15px;
+                text-align: left;
+                padding: 10px 20px;
+            }
+            QPushButton:hover {
+                background-color: #005f73;
+            }
+        """
+
+        # Create navigation buttons
+        for index, (text, icon_path) in enumerate(nav_buttons):
             button = QPushButton()
             button.setText(text)
             button.setIcon(QIcon(icon_path))
             button.setIconSize(QPixmap(icon_path).scaled(20, 20, Qt.KeepAspectRatio).size())
-            button.setStyleSheet("""
-                QPushButton {
-                    color: white;
-                    background-color: transparent;
-                    border: none;
-                    font-size: 16px;
-                    text-align: left;
-                    padding: 10px 20px;
-                }
-                QPushButton:hover {
-                    background-color: #005f73;
-                }
-                QPushButton:hover QIcon {
-                    color: #000000; /* Change SVG icon color on hover */
-                }
-            """)
+            button.setStyleSheet(inactive_style)
             sidebar_layout.addWidget(button)
             self.nav_button_dict[text] = button
-        
-        self.nav_button_dict["Home"].clicked.connect(lambda: self.content_area.setCurrentIndex(0))
-        self.nav_button_dict["Dashboard"].clicked.connect(lambda: self.content_area.setCurrentIndex(1))
-        self.nav_button_dict["Settings"].clicked.connect(lambda: self.content_area.setCurrentIndex(2))
+
+            # Connect button click to change tab and active status
+            button.clicked.connect(lambda _, idx=index: self.switch_tab(idx, active_style, inactive_style))
 
         sidebar_layout.addStretch()
         return sidebar
 
+    def switch_tab(self, index, active_style, inactive_style):
+        # Switch the current tab
+        self.content_area.setCurrentIndex(index)
+
+        # Update styles for all buttons
+        for text, button in self.nav_button_dict.items():
+            if self.content_area.currentIndex() == list(self.nav_button_dict.keys()).index(text):
+                button.setStyleSheet(active_style)
+            else:
+                button.setStyleSheet(inactive_style)
 
 def main():
     app = QApplication(sys.argv)

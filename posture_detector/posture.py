@@ -43,9 +43,7 @@ class PostureWatcher:
         self.detector = PoseDetector()
         self.deviation = Deviation(threshold=deviation_threshold, max_buffer=deviation_buffer)
 
-        self.cap = cv2.VideoCapture(0)
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 720)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        
         self.last_fps_calc_timestamp = 0
 
         self.base_posture = base_posture
@@ -57,13 +55,18 @@ class PostureWatcher:
         self.debug = debug
         self.logger = Logger('PW')
 
-    def run(self):
+    def run(self,camera_index=0):
         """
         Finds a pose, compares it to the base posture, and notifies the user if the deviation is above the threshold.
         """
         if not self.base_posture:
             return
-
+        self.cap = cv2.VideoCapture(camera_index)
+        # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 720)
+        # self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        if not self.cap.isOpened():
+            raise Exception("Error: Cannot access the webcam.")
+        
         _, img = self.cap.read()
         img, _ = self.detector.find_pose(img)
         self.deviation.current_deviation = self._get_deviation_from_base_posture()
@@ -168,5 +171,5 @@ class PostureWatcher:
         cd = self.deviation.current_deviation
         buffer = self.deviation.current_buffer
 
-        # self._log_deviation(cd, buffer)
+        self._log_deviation(cd, buffer)
 

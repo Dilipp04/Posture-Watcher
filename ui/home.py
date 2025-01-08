@@ -28,6 +28,7 @@ class Home(QFrame):
         self.init_ui()
 
     def init_ui(self):
+        self.setStyleSheet("background-color: white;")  # Set background color
         # Camera view tab layout
         layout = QVBoxLayout(self)
 
@@ -44,7 +45,7 @@ class Home(QFrame):
         # Example button style code
         self.start_button.setStyleSheet("""
             QPushButton {
-                background-color: #012E54;  /* Gold color */
+                background-color: #013E54;  /* Gold color */
                 border: none;                /* No border */
                 border-radius: 8px;         /* Rounded corners */
                 padding: 10px 20px;         /* Padding for better size */
@@ -59,7 +60,7 @@ class Home(QFrame):
         self.stop_button = QPushButton("Stop", self)
         self.stop_button.setStyleSheet("""
             QPushButton {
-                background-color: #012E54;  /* Gold color */
+                background-color: #013E54;  /* Gold color */
                 border: none;                /* No border */
                 border-radius: 8px;         /* Rounded corners */
                 padding: 10px 20px;         /* Padding for better size */
@@ -74,7 +75,7 @@ class Home(QFrame):
         self.set_base_button = QPushButton("Set Base Posture", self)
         self.set_base_button.setStyleSheet("""
             QPushButton {
-                background-color: #012E54;  /* Gold color */
+                background-color: #013E54;  /* Gold color */
                 border: none;                /* No border */
                 border-radius: 8px;         /* Rounded corners */
                 padding: 10px 20px;         /* Padding for better size */
@@ -155,7 +156,7 @@ class Home(QFrame):
 
     def _update_posture_status(self, deviation):
         # Determine if the posture is good or bad
-        if deviation < 25:
+        if deviation < 35:
             self.posture_status_label.setText("Posture Status: Good ✅")
             posture_status = "Good"
         else:

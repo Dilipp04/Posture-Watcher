@@ -15,13 +15,13 @@ class PostureAnalyzer:
         self.pose = self.mp_pose.Pose()
         self.cap = None
 
-    def start_camera(self, camera_index=0):
+    def run(self, camera_index=0):
         self.cap = cv2.VideoCapture(camera_index)
         if not self.cap.isOpened():
             raise Exception("Error: Cannot access the webcam.")
         self.fps = int(self.cap.get(cv2.CAP_PROP_FPS))
 
-    def release_camera(self):
+    def stop(self):
         if self.cap:
             self.cap.release()
 
@@ -124,14 +124,14 @@ class PostureApp(QWidget):
 
     def start_monitoring(self):
         try:
-            self.posture_analyzer.start_camera()
+            self.posture_analyzer.run()
             self.timer.start(30)  # 30ms for ~33 FPS
         except Exception as e:
             self.status_label.setText(str(e))
 
     def stop_monitoring(self):
         self.timer.stop()
-        self.posture_analyzer.release_camera()
+        self.posture_analyzer.stop()
         self.status_label.setText("Monitoring stopped.")
 
     def update_frame(self):
