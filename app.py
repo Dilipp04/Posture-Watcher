@@ -7,6 +7,6 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QW
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = Home()
+    window = PostureWatcherUI()
     window.showMaximized()
     sys.exit(app.exec())

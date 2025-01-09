@@ -1,164 +1,114 @@
-import cv2
-from PySide6.QtCore import QTimer, Qt
-from PySide6.QtGui import QImage, QPixmap
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout,QFrame
-from posture_detector import PostureWatcher  # Assuming PostureWatcher from previous code
+from PySide6.QtWidgets import (
+    QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QGridLayout,QFrame,QApplication
+)
+import sys
+from os import system
+from PySide6.QtCore import QTimer, Qt, QTime
+from PySide6.QtGui import QPixmap, QImage, QFont
+from posture_detector.sidePostureAnalyzer import SidePostureAnalyzer
+from posture_detector.frontPostureAnalyzer import FrontPostureAnalyzer
 
 class Home(QFrame):
     def __init__(self):
         super().__init__()
+        self.posture_analyzer = FrontPostureAnalyzer()
+        # self.posture_analyzer = SidePostureAnalyzer()
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_frame)
 
-        # Initialize the PostureWatcher
-        self.posture_watcher = PostureWatcher()
+        self.clock_timer = QTimer(self)
+        self.clock_timer.timeout.connect(self.update_clock)
 
-        # Timer for updating frames and counting elapsed time
-        self.frame_timer = QTimer()
-        self.frame_timer.timeout.connect(self.update_frame)
-
-        self.elapsed_time_timer = QTimer()
-        self.elapsed_time_timer.timeout.connect(self.update_elapsed_time)
-        self.elapsed_time = 0  # Initialize elapsed time
-
-        # Initialize CSV file for posture history
-        self.history_file = "posture_history.csv"
-        self.history = []
-        self.last_save_time = 0  # Initialize the last save time
-
-        # Setup UI components
         self.init_ui()
 
     def init_ui(self):
-        self.setStyleSheet("background-color: white;")  # Set background color
-        # Camera view tab layout
-        layout = QVBoxLayout(self)
-
-        # Video display label
+        # Video display
         self.video_label = QLabel(self)
         self.video_label.setFixedSize(720, 480)
+        self.video_label.setStyleSheet("background-color: #f0f0f0; border: 1px solid #d6d6d6;")
+        self.video_label.setAlignment(Qt.AlignCenter)
 
-        # Timer label to display elapsed time
-        self.timer_label = QLabel("Elapsed Time: 00:00", self)
-        self.timer_label.setAlignment(Qt.AlignCenter)
+        # Clock display
+        self.clock_label = QLabel(self)
+        self.clock_label.setAlignment(Qt.AlignCenter)
+        self.clock_label.setFont(QFont("Arial", 16))
+        self.setStyleSheet("color:black")
 
-        # Start and stop buttons
+        # Buttons
         self.start_button = QPushButton("Start", self)
-        # Example button style code
-        self.start_button.setStyleSheet("""
-            QPushButton {
-                background-color: #013E54;  /* Gold color */
-                border: none;                /* No border */
-                border-radius: 8px;         /* Rounded corners */
-                padding: 10px 20px;         /* Padding for better size */
-                font-size: 16px;            /* Larger font */
-                font-weight: bold;          /* Bold text */
-                color: white;               /* White text color */
-            }
-        """)
+        self.start_button.setFixedSize(120, 40)
+        self.start_button.setStyleSheet("background-color: #003d4d; color: white;")
+        self.start_button.clicked.connect(self.start_monitoring)
 
-        self.start_button.clicked.connect(self.start_posture_monitor)
-
-        self.stop_button = QPushButton("Stop", self)
-        self.stop_button.setStyleSheet("""
-            QPushButton {
-                background-color: #013E54;  /* Gold color */
-                border: none;                /* No border */
-                border-radius: 8px;         /* Rounded corners */
-                padding: 10px 20px;         /* Padding for better size */
-                font-size: 16px;            /* Larger font */
-                font-weight: bold;          /* Bold text */
-                color: white;               /* White text color */
-            }
-        """)
-        self.stop_button.clicked.connect(self.stop_posture_monitor)
-
-        # Set base posture button
-        self.set_base_button = QPushButton("Set Base Posture", self)
-        self.set_base_button.setStyleSheet("""
-            QPushButton {
-                background-color: #013E54;  /* Gold color */
-                border: none;                /* No border */
-                border-radius: 8px;         /* Rounded corners */
-                padding: 10px 20px;         /* Padding for better size */
-                font-size: 16px;            /* Larger font */
-                font-weight: bold;          /* Bold text */
-                color: white;               /* White text color */
-            }
-        """)
+        self.set_base_button = QPushButton("Set base posture", self)
+        self.set_base_button.setFixedSize(120, 40)
+        self.set_base_button.setStyleSheet("background-color: #003d4d; color: white;")
         self.set_base_button.clicked.connect(self.set_base_posture)
 
-        # Status label to show posture deviation
-        self.status_label = QLabel("Deviation: None", self)
-        self.status_label.setAlignment(Qt.AlignCenter)
+        self.stop_button = QPushButton("Stop", self)
+        self.stop_button.setFixedSize(120, 40)
+        self.stop_button.setStyleSheet("background-color: #003d4d; color: white;")
+        self.stop_button.clicked.connect(self.stop_monitoring)
 
-        # Good/Bad posture label
-        self.posture_status_label = QLabel("Posture Status: Unknown", self)
-        self.posture_status_label.setAlignment(Qt.AlignCenter)
+        # Layout setup
+        main_layout = QVBoxLayout(self)
 
-        # Layout for camera view tab
+        # Add video frame
+        main_layout.addWidget(self.video_label, alignment=Qt.AlignCenter)
+
+        # Add clock
+        main_layout.addWidget(self.clock_label, alignment=Qt.AlignCenter)
+
+        # Add buttons
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.start_button)
-        button_layout.addWidget(self.stop_button)
         button_layout.addWidget(self.set_base_button)
+        button_layout.addWidget(self.stop_button)
+        main_layout.addLayout(button_layout)
 
-        layout.addWidget(self.video_label)
-        layout.addWidget(self.timer_label)
-        layout.addLayout(button_layout)
-        layout.addWidget(self.status_label)
-        layout.addWidget(self.posture_status_label)
+        self.setLayout(main_layout)
 
-        self.setLayout(layout)
+        # Start clock timer
+        self.clock_timer.start(1000)  # Update clock every second
+        self.update_clock()
 
-    def start_posture_monitor(self):
-        # Start the posture watcher and the timer to update frames
-        self.frame_timer.start(30)  # Update frame every 30ms (around 33 FPS)
-        self.elapsed_time_timer.start(1000)  # Update elapsed time every second
-        self.status_label.setText("Monitoring started...")
+    def start_monitoring(self):
+        try:
+            self.posture_analyzer.run()
+            self.timer.start(30)  # 30ms for ~33 FPS
+        except Exception as e:
+            self.video_label.setText(str(e))
 
-    def stop_posture_monitor(self):
-        # Stop the posture watcher and release the resources
-        self.frame_timer.stop()
-        self.elapsed_time_timer.stop()  # Stop the elapsed time timer
-        self.status_label.setText("Monitoring stopped.")
+    def stop_monitoring(self):
+        self.timer.stop()
+        self.posture_analyzer.stop()
+        self.video_label.setText("Monitoring stopped.")
 
     def set_base_posture(self):
-        # Capture base posture for comparison
-        self.posture_watcher.set_base_posture()
-        self.status_label.setText("Base posture set")
-
-    def update_elapsed_time(self):
-        # Update the elapsed time and display it in the timer label
-        self.elapsed_time += 1
-        minutes, seconds = divmod(self.elapsed_time, 60)
-        self.timer_label.setText(f"Elapsed Time: {minutes:02}:{seconds:02}")
+        # Logic to set the base posture
+        self.posture_analyzer.set_base_posture()
+        self.video_label.setText("Base posture set.")
 
     def update_frame(self):
-        # Fetch the current frame from PostureWatcher and display it in the QLabel
-        ret, img = self.posture_watcher.cap.read()
-        if not ret:
-            return  # Exit if there's an issue grabbing the frame
+        frame, posture_data = self.posture_analyzer.process_frame()
         
-        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # Convert from BGR to RGB format
-
-        # Run the PostureWatcher logic to analyze the posture
-        self.posture_watcher.run()
-
-        # Convert image to QImage and display it in QLabel
-        height, width, channel = img_rgb.shape
-        bytes_per_line = channel * width
-        qimg = QImage(img_rgb.data, width, height, bytes_per_line, QImage.Format_RGB888)
-        self.video_label.setPixmap(QPixmap.fromImage(qimg))
-
-        # Display deviation in status label
-        if self.posture_watcher.deviation.current_deviation is not None:
-            deviation = self.posture_watcher.deviation.current_deviation
-            self.status_label.setText(f"Deviation: {deviation}%")
-            self._update_posture_status(deviation)
-
-    def _update_posture_status(self, deviation):
-        # Determine if the posture is good or bad
-        if deviation < 35:
-            self.posture_status_label.setText("Posture Status: Good ✅")
-            posture_status = "Good"
+        if frame is not None:
+            height, width, channel = frame.shape
+            bytes_per_line = channel * width
+            qimg = QImage(frame.data, width, height, bytes_per_line, QImage.Format_BGR888)
+            self.video_label.setPixmap(QPixmap.fromImage(qimg))
         else:
-            self.posture_status_label.setText("Posture Status: Bad ❌")
-            posture_status = "Bad"
+            self.video_label.setText("No frame available.")
+
+    def update_clock(self):
+        current_time = QTime.currentTime().toString("hh:mm:ss")
+        self.clock_label.setText(current_time)
+
+def main():
+    app = QApplication(sys.argv)
+    mainWin = Home()
+    mainWin.show()
+    sys.exit(app.exec())
+
+if __name__ == '__main__':
+    main()

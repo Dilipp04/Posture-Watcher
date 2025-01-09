@@ -16,7 +16,7 @@ class BasePosture:
         self.right_shoulder = right_shoulder
 
 
-class PostureWatcher:
+class FrontPostureAnalyzer:
     """
     PostureWatcher is responsible for monitoring the posture of a user.
     It uses PoseDetector to compare the user's current posture to the base posture.
@@ -43,7 +43,9 @@ class PostureWatcher:
         self.detector = PoseDetector()
         self.deviation = Deviation(threshold=deviation_threshold, max_buffer=deviation_buffer)
 
-        
+        self.cap = cv2.VideoCapture(0)
+        # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 720)
+        # self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
         self.last_fps_calc_timestamp = 0
 
         self.base_posture = base_posture
@@ -59,25 +61,20 @@ class PostureWatcher:
         """
         Finds a pose, compares it to the base posture, and notifies the user if the deviation is above the threshold.
         """
-        if not self.base_posture:
-            return
         self.cap = cv2.VideoCapture(camera_index)
-        # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 720)
-        # self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
         if not self.cap.isOpened():
             raise Exception("Error: Cannot access the webcam.")
         
-        _, img = self.cap.read()
-        img, _ = self.detector.find_pose(img)
-        self.deviation.current_deviation = self._get_deviation_from_base_posture()
-        self._handle_deviation()
+        if not self.base_posture:
+            return
+            self.set_base_posture()
 
     def stop(self):
         """
         Stops Posture Watcher and destroys allocated resources.
         """
-        self.cap.release()
-        cv2.destroyAllWindows()
+        if self.cap:
+            self.cap.release()
 
     def set_base_posture(self):
         _, img = self.cap.read()
@@ -89,6 +86,27 @@ class PostureWatcher:
             l_shoulder = lm[11]
             r_shoulder = lm[12]
             self.base_posture = BasePosture(nose, mouth_l, mouth_r, l_shoulder, r_shoulder)
+
+    def process_frame(self):
+        if not self.cap:
+            raise Exception("Camera not started.")
+        success, image = self.cap.read()
+        if not success:
+            return None, None
+
+        # h, w = image.shape[:2]
+        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        keypoints = self.detector.pose.process(image_rgb)
+        image_bgr = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
+
+        posture_data = {"status": "Unknown", "deviation": None}
+
+        if keypoints.pose_landmarks:
+            self.deviation.current_deviation = self._get_deviation_from_base_posture()
+
+            self._handle_deviation()
+
+        return image_bgr, posture_data
 
     def _get_deviation_from_base_posture(self, algorithm_version: int = 1):
         """
@@ -147,7 +165,7 @@ class PostureWatcher:
         :return: None
         """
         Logger.clear_console()
-
+        print(cd)
         if self.deviation.has_deviated():
             self.logger.notify(f"Detected deviation from base posture by {cd}%", color='red', with_sound=True)
         else:

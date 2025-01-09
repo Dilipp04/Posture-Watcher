@@ -1,12 +1,11 @@
 import cv2
 import math as m
 import mediapipe as mp
-from PySide6.QtCore import QTimer, Qt
-from PySide6.QtGui import QImage, QPixmap
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QApplication
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QApplication, QHBoxLayout
+from PySide6.QtCore import QTimer, Qt, QTime
+from PySide6.QtGui import QPixmap, QImage, QFont
 
-
-class PostureAnalyzer:
+class SidePostureAnalyzer:
     def __init__(self):
         self.good_frames = 0
         self.bad_frames = 0
@@ -76,8 +75,8 @@ class PostureAnalyzer:
                 self.good_frames = 0
                 self.bad_frames += 1
                 posture_data["status"] = "Bad"
-
         return image_bgr, posture_data
+
 
     @staticmethod
     def calculate_angle(x1, y1, x2, y2):
@@ -86,72 +85,3 @@ class PostureAnalyzer:
             return theta * (180 / m.pi)
         except ValueError:
             return 0
-
-
-class PostureApp(QWidget):
-    def __init__(self):
-        super().__init__()
-        # self.setWindowFlag(Qt.FramelessWindowHint)  # No border
-
-        self.posture_analyzer = PostureAnalyzer()
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_frame)
-
-        self.init_ui()
-
-    def init_ui(self):
-        self.setWindowTitle("Posture Monitoring")
-
-        self.video_label = QLabel(self)
-        self.video_label.setFixedSize(720, 480)
-
-        self.status_label = QLabel("Status: Unknown", self)
-        self.status_label.setAlignment(Qt.AlignCenter)
-
-        self.start_button = QPushButton("Start", self)
-        self.start_button.clicked.connect(self.start_monitoring)
-
-        self.stop_button = QPushButton("Stop", self)
-        self.stop_button.clicked.connect(self.stop_monitoring)
-
-        layout = QVBoxLayout(self)
-        layout.addWidget(self.video_label)
-        layout.addWidget(self.status_label)
-        layout.addWidget(self.start_button)
-        layout.addWidget(self.stop_button)
-
-        self.setLayout(layout)
-
-    def start_monitoring(self):
-        try:
-            self.posture_analyzer.run()
-            self.timer.start(30)  # 30ms for ~33 FPS
-        except Exception as e:
-            self.status_label.setText(str(e))
-
-    def stop_monitoring(self):
-        self.timer.stop()
-        self.posture_analyzer.stop()
-        self.status_label.setText("Monitoring stopped.")
-
-    def update_frame(self):
-        frame, posture_data = self.posture_analyzer.process_frame()
-        if frame is not None:
-            height, width, channel = frame.shape
-            bytes_per_line = channel * width
-            qimg = QImage(frame.data, width, height, bytes_per_line, QImage.Format_BGR888)
-            self.video_label.setPixmap(QPixmap.fromImage(qimg))
-
-            if posture_data["status"]:
-                self.status_label.setText(f"Posture Status: {posture_data['status']}")
-        else:
-            self.status_label.setText("No frame available.")
-
-
-if __name__ == "__main__":
-    import sys
-
-    app = QApplication(sys.argv)
-    window = PostureApp()
-    window.show()
-    sys.exit(app.exec())
