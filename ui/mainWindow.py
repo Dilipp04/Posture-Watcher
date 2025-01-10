@@ -12,8 +12,9 @@ class PostureWatcherUI(QWidget):
 
     def init_ui(self):
         super().__init__()
-        self.setWindowTitle("Posture Monitor")
+        self.setWindowTitle("Posture Watcher")
         self.setGeometry(100, 100, 1200, 800)
+        self.setWindowIcon(QIcon("assets/window-icon.png"))
 
         main_layout = QHBoxLayout(self)
         self.setStyleSheet("background-color: #f3f4f6;")

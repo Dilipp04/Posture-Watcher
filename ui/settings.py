@@ -95,13 +95,39 @@ class Settings(QWidget):
         dropdown = QComboBox()
         dropdown.addItems(["Webcam", "External Camera", "Virtual Camera"])
         dropdown.setStyleSheet("""
-            QComboBox {
-                font-size: 14px;
-                padding: 5px;
-                border: 1px solid #ccc;
-                border-radius: 5px;
-            }
-        """)
+    QComboBox {
+        font-size: 14px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        color: #333;
+    }
+    QComboBox:hover {
+        border: 1px solid #4CAF50; /* Change border color on hover */
+    }
+    QComboBox::drop-down {
+        border: none;
+        background: transparent;
+        subcontrol-origin: padding;
+        subcontrol-position: top right;
+        width: 20px;
+    }
+    QComboBox::down-arrow {
+        image: url('assets/dropdown_arrow.svg');
+        width: 20px;
+        height: 20px;
+    }
+    QComboBox QAbstractItemView {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #ffffff;
+        color: #333;
+        selection-background-color: #4CAF50;
+        selection-color: white;
+    }
+""")
+
         dropdown.setFixedSize(230, 30)
         return dropdown
 

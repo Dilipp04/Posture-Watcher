@@ -14,7 +14,7 @@ class Dashboard(QWidget):
         self.text_color = "#000000"
         self.setWindowTitle("Dashboard")
         self.setMinimumSize(1000, 700)
-        self.setStyleSheet(f"background-color:white;color:{self.text_color};padding:10px")
+        self.setStyleSheet(f"background-color:white;color:{self.text_color};")
 
         self.setup_ui()
 
@@ -31,7 +31,7 @@ class Dashboard(QWidget):
         
         # Header Section
         header = QWidget()
-        header.setStyleSheet("background-color: #e0f7fa; border-radius: 10px; padding: 10px;")
+        header.setStyleSheet("background-color: #e0f7fa; border-radius: 10px; padding: 20px;")
         header_layout = QHBoxLayout(header)
 
         header_label = QLabel("Hii Good Morning")
@@ -67,7 +67,7 @@ class Dashboard(QWidget):
     def create_stat_card(self, title, value, subtitle, bg_color):
         card = QFrame()
         card.setFrameShape(QFrame.StyledPanel)
-        card.setStyleSheet(f"background-color: {bg_color}; border-radius: 10px;")
+        card.setStyleSheet(f"background-color: {bg_color}; border-radius: 10px;padding: 10px;")
         layout = QVBoxLayout(card)
         layout.setContentsMargins(15, 15, 15, 15)
         layout.setSpacing(5)
@@ -108,7 +108,7 @@ class Dashboard(QWidget):
             day_layout = QHBoxLayout()
 
             # Add a day label
-            day_label = QLabel(f"{day} {i+1}")
+            day_label = QLabel(f"{i+1} {day}")
             day_label.setFont(QFont("Arial", 10))
             day_label.setAlignment(Qt.AlignLeft)
 
