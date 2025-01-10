@@ -5,8 +5,11 @@ from ui.dashboard import Dashboard
 from ui.mainWindow import PostureWatcherUI
 from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget
 
-if __name__ == "__main__":
+def main():
+
     app = QApplication(sys.argv)
-    window = PostureWatcherUI()
+    window = Settings()
     window.showMaximized()
     sys.exit(app.exec())
+if __name__ == "__main__":
+    main()

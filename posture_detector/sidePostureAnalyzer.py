@@ -1,9 +1,6 @@
 import cv2
 import math as m
 import mediapipe as mp
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QApplication, QHBoxLayout
-from PySide6.QtCore import QTimer, Qt, QTime
-from PySide6.QtGui import QPixmap, QImage, QFont
 
 class SidePostureAnalyzer:
     def __init__(self):
@@ -37,7 +34,6 @@ class SidePostureAnalyzer:
         image_bgr = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
 
         posture_data = {"status": "Unknown", "neck_inclination": None, "torso_inclination": None}
-
         if keypoints.pose_landmarks:
             lm = keypoints.pose_landmarks
             lmPose = self.mp_pose.PoseLandmark

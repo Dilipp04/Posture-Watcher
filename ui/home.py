@@ -22,6 +22,13 @@ class Home(QFrame):
         self.init_ui()
 
     def init_ui(self):
+
+        # Title
+        title = QLabel("Posture Analyzer")
+        title.setFont(QFont("Arial", 20, QFont.Bold))
+        title.setStyleSheet("margin:15px 10px; padding: 10px;")
+        title.setAlignment(Qt.AlignLeft)
+
         # Video display
         self.video_label = QLabel(self)
         self.video_label.setFixedSize(720, 480)
@@ -52,7 +59,7 @@ class Home(QFrame):
 
         # Layout setup
         main_layout = QVBoxLayout(self)
-
+        main_layout.addWidget(title)
         # Add video frame
         main_layout.addWidget(self.video_label, alignment=Qt.AlignCenter)
 

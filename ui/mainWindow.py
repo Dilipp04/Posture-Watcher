@@ -47,7 +47,7 @@ class PostureWatcherUI(QWidget):
         logo = QLabel()
         logo.setAlignment(Qt.AlignCenter)
         logo.setPixmap(QPixmap("assets/logo-transparent1.png").scaled(100, 50, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-        logo.setStyleSheet("margin:20px 10px")
+        logo.setStyleSheet("margin:15px 10px")
         sidebar_layout.addWidget(logo)
 
         # Navigation buttons

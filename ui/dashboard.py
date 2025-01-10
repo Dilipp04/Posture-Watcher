@@ -14,22 +14,27 @@ class Dashboard(QWidget):
         self.text_color = "#000000"
         self.setWindowTitle("Dashboard")
         self.setMinimumSize(1000, 700)
-        self.setStyleSheet(f"color: {self.text_color};")
+        self.setStyleSheet(f"background-color:white;color:{self.text_color};padding:10px")
+
         self.setup_ui()
 
     def setup_ui(self):
         # Main layout
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(10, 10, 10, 10)
-        main_layout.setSpacing(15)
+        # main_layout.setSpacing(15)
 
+        title = QLabel("DashBoard")
+        title.setFont(QFont("Arial", 20, QFont.Bold))
+        title.setStyleSheet("margin:10px 10px; padding: 10px;")
+        title.setAlignment(Qt.AlignLeft)
+        main_layout.addWidget(title)
+        
         # Header Section
         header = QWidget()
         header.setStyleSheet("background-color: #e0f7fa; border-radius: 10px; padding: 10px;")
         header_layout = QHBoxLayout(header)
-        header_layout.setContentsMargins(15, 15, 15, 15)
 
-        header_label = QLabel("DashBoard")
+        header_label = QLabel("Hii Good Morning")
         header_label.setFont(QFont("Arial", 20, QFont.Bold))
         header_label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
 
@@ -44,8 +49,6 @@ class Dashboard(QWidget):
 
         # Statistics Row
         stats_layout = QHBoxLayout()
-        stats_layout.setSpacing(15)
-
         stats_layout.addWidget(self.create_stat_card("Todays", "72%", "Success", self.bg_color))
         stats_layout.addWidget(self.create_stat_card("Total", "45%", "Success", self.bg_color))
         stats_layout.addWidget(self.create_stat_card("Achievement", "720/1,000 MIN", "1", self.bg_color))

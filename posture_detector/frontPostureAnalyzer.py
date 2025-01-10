@@ -54,8 +54,8 @@ class FrontPostureAnalyzer:
         self.deviation_adjustment = deviation_adjustment
 
         self.thread = None
-        self.debug = debug
-        self.logger = Logger('PW')
+        # self.debug = debug
+        # self.logger = Logger('PW')
 
     def run(self,camera_index=0):
         """
@@ -103,7 +103,7 @@ class FrontPostureAnalyzer:
 
         if keypoints.pose_landmarks:
             self.deviation.current_deviation = self._get_deviation_from_base_posture()
-
+            posture_data['deviation']= self.deviation.current_deviation
             self._handle_deviation()
 
         return image_bgr, posture_data
@@ -164,8 +164,6 @@ class FrontPostureAnalyzer:
         Logs the deviation using the built-in logging utility.
         :return: None
         """
-        Logger.clear_console()
-        print(cd)
         if self.deviation.has_deviated():
             self.logger.notify(f"Detected deviation from base posture by {cd}%", color='red', with_sound=True)
         else:
@@ -189,5 +187,5 @@ class FrontPostureAnalyzer:
         cd = self.deviation.current_deviation
         buffer = self.deviation.current_buffer
 
-        self._log_deviation(cd, buffer)
+        # self._log_deviation(cd, buffer)
 
