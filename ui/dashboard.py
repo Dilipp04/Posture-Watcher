@@ -1,13 +1,14 @@
 from PySide6.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame, QGridLayout ,QProgressBar
+    QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame, QGridLayout, QProgressBar
 )
-from PySide6.QtGui import QFont, QPixmap 
+from PySide6.QtGui import QFont, QPixmap
 from PySide6.QtCore import Qt
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
+import matplotlib.pyplot as plt
 
 
 class Dashboard(QWidget):
 
-     
     def __init__(self):
         super().__init__()
         self.bg_color = "#e0f7fa"
@@ -21,14 +22,13 @@ class Dashboard(QWidget):
     def setup_ui(self):
         # Main layout
         main_layout = QVBoxLayout(self)
-        # main_layout.setSpacing(15)
 
         title = QLabel("DashBoard")
         title.setFont(QFont("Arial", 20, QFont.Bold))
         title.setStyleSheet("margin:10px 10px; padding: 10px;")
         title.setAlignment(Qt.AlignLeft)
         main_layout.addWidget(title)
-        
+
         # Header Section
         header = QWidget()
         header.setStyleSheet("background-color: #e0f7fa; border-radius: 10px; padding: 20px;")
@@ -49,9 +49,9 @@ class Dashboard(QWidget):
 
         # Statistics Row
         stats_layout = QHBoxLayout()
-        stats_layout.addWidget(self.create_stat_card("Todays", "72%", "Success", self.bg_color))
-        stats_layout.addWidget(self.create_stat_card("Total", "45%", "Success", self.bg_color))
-        stats_layout.addWidget(self.create_stat_card("Achievement", "720/1,000 MIN", "1", self.bg_color))
+        stats_layout.addWidget(self.create_stat_card("Today's", 72, "Success", self.bg_color))
+        stats_layout.addWidget(self.create_stat_card("Total", 45, "Success", self.bg_color))
+        stats_layout.addWidget(self.create_stat_card("Achievement", 72, "Goal", self.bg_color))
 
         main_layout.addLayout(stats_layout)
 
@@ -68,27 +68,61 @@ class Dashboard(QWidget):
         card = QFrame()
         card.setFrameShape(QFrame.StyledPanel)
         card.setStyleSheet(f"background-color: {bg_color}; border-radius: 10px;padding: 10px;")
-        layout = QVBoxLayout(card)
+        layout = QHBoxLayout(card)  # Use horizontal layout to align text and chart
         layout.setContentsMargins(15, 15, 15, 15)
-        layout.setSpacing(5)
+        layout.setSpacing(10)
+
+        # Left Side: Title, Value, and Subtitle
+        text_layout = QVBoxLayout()
 
         title_label = QLabel(title)
         title_label.setFont(QFont("Arial", 12, QFont.Bold))
         title_label.setAlignment(Qt.AlignLeft)
 
-        value_label = QLabel(value)
+        value_label = QLabel(f"{value}%")
         value_label.setFont(QFont("Arial", 28, QFont.Bold))
-        value_label.setAlignment(Qt.AlignCenter)
+        value_label.setAlignment(Qt.AlignLeft)
 
         subtitle_label = QLabel(subtitle)
         subtitle_label.setFont(QFont("Arial", 10))
-        subtitle_label.setAlignment(Qt.AlignCenter)
+        subtitle_label.setAlignment(Qt.AlignLeft)
 
-        layout.addWidget(title_label)
-        layout.addWidget(value_label)
-        layout.addWidget(subtitle_label)
+        text_layout.addWidget(title_label)
+        text_layout.addWidget(value_label)
+        text_layout.addWidget(subtitle_label)
+
+        # Right Side: Donut Chart
+        donut_chart = self.create_donut_chart(value)
+
+        layout.addLayout(text_layout)
+        layout.addWidget(donut_chart, alignment=Qt.AlignRight)
 
         return card
+
+    def create_donut_chart(self, percentage):
+        # Create a Matplotlib figure for the donut chart
+        fig, ax = plt.subplots(figsize=(2.5, 2.5))  # Adjust the figure size as needed
+        fig.patch.set_alpha(0)  # Remove the background of the figure
+
+        sizes = [percentage, 100 - percentage]
+        colors = ['#00767C', '#e0e0e0']  # Colors for the segments
+
+        ax.pie(
+            sizes,
+            colors=colors,
+            startangle=90,
+            wedgeprops={'width': 0.3, 'edgecolor': 'white'},  # 'width' makes it hollow
+        )
+
+        # Equal aspect ratio ensures the pie chart is drawn as a circle
+        ax.axis('equal')
+        ax.set_facecolor((1, 1, 1, 0))  # Set the axis background to transparent
+
+        # Embed the chart into the PySide6 application using FigureCanvas
+        canvas = FigureCanvas(fig)
+        plt.close(fig)  # Close the figure to prevent it from showing separately
+
+        return canvas
 
     def create_progress_card(self, title, bg_color):
         card = QFrame()
@@ -152,10 +186,11 @@ class Dashboard(QWidget):
 
 def main():
     import sys
-
     app = QApplication(sys.argv)
     dashboard = Dashboard()
     dashboard.show()
     sys.exit(app.exec())
-if __name__ == "__main__":
+
+
+if __name__ == "_main_":
     main()

@@ -5,10 +5,13 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
 from components.ToggleSwitch import ToggleSwitch
+from states.state import State
 
 class Settings(QWidget):
-    def __init__(self):
+    def __init__(self,state:State):
         super().__init__()
+
+        self.state = state
         self.setStyleSheet("background-color:white;color:black;padding:10px")
         main_layout = QVBoxLayout(self)
 
@@ -21,7 +24,7 @@ class Settings(QWidget):
         # Create QListWidget
         self.list_widget = QListWidget()
         self.list_widget.setStyleSheet("QListWidget { border: none; }")
-        self.list_widget.setSpacing(15)  
+        self.list_widget.setSpacing(15)
         main_layout.addWidget(self.list_widget)
 
         # Add sections to the QListWidget
@@ -33,22 +36,22 @@ class Settings(QWidget):
         self.add_section(
             "Camera Angle",
             "",
-            self.create_toggle_buttons(["Front", "Side"])
+            self.create_toggle_buttons(["Front", "Side"], "camera_angle")
         )
         self.add_section(
             "Position",
             "",
-            self.create_toggle_buttons(["Left", "Middle", "Right"])
+            self.create_toggle_buttons(["Left", "Middle", "Right"],"position")
         )
         self.add_section(
             "Play Sound",
             "",
-            self.create_toggle_switch()
+            self.create_toggle_switch("play_sound")
         )
         self.add_section(
             "Delay",
             "",
-            self.create_toggle_buttons(["3s", "10s", "15s"])
+            self.create_toggle_buttons(["3", "10", "15"], "delay")
         )
 
     def add_section(self, title, description, widget):
@@ -64,7 +67,7 @@ class Settings(QWidget):
 
         # Create a vertical layout for the title and description
         text_layout = QVBoxLayout()
-        text_layout.setSpacing(5)  # Spacing between title and description
+        text_layout.setSpacing(5)
         text_layout.setContentsMargins(0, 0, 0, 0)
 
         # Add title
@@ -77,7 +80,7 @@ class Settings(QWidget):
             desc_label = QLabel(description)
             desc_label.setFont(QFont("Arial", 10))
             desc_label.setStyleSheet("color: gray;")
-            desc_label.setWordWrap(True)  # Enable word wrapping
+            desc_label.setWordWrap(True)
             text_layout.addWidget(desc_label)
 
         # Add layouts to the horizontal layout
@@ -93,45 +96,50 @@ class Settings(QWidget):
     def create_camera_dropdown(self):
         """Create a dropdown menu for camera selection."""
         dropdown = QComboBox()
-        dropdown.addItems(["Webcam", "External Camera", "Virtual Camera"])
+        dropdown.addItems(["Webcam", "Virtual Camera", "External Camera"])
         dropdown.setStyleSheet("""
-    QComboBox {
-        font-size: 14px;
-        padding: 5px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        background-color: #f9f9f9;
-        color: #333;
-    }
-    QComboBox:hover {
-        border: 1px solid #4CAF50; /* Change border color on hover */
-    }
-    QComboBox::drop-down {
-        border: none;
-        background: transparent;
-        subcontrol-origin: padding;
-        subcontrol-position: top right;
-        width: 20px;
-    }
-    QComboBox::down-arrow {
-        image: url('assets/dropdown_arrow.svg');
-        width: 20px;
-        height: 20px;
-    }
-    QComboBox QAbstractItemView {
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        background-color: #ffffff;
-        color: #333;
-        selection-background-color: #4CAF50;
-        selection-color: white;
-    }
-""")
+            QComboBox {
+                font-size: 14px;
+                padding: 5px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                background-color: #f9f9f9;
+                color: #333;
+            }
+            QComboBox:hover {
+                border: 1px solid #4CAF50;
+            }
+            QComboBox::drop-down {
+                border: none;
+                background: transparent;
+                subcontrol-origin: padding;
+                subcontrol-position: top right;
+                width: 20px;
+            }
+            QComboBox::down-arrow {
+                image: url('assets/dropdown_arrow.svg');
+                width: 20px;
+                height: 20px;
+            }
+            QComboBox QAbstractItemView {
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                background-color: #ffffff;
+                color: #333;
+                selection-background-color: #4CAF50;
+                selection-color: white;
+            }
+        """)
 
         dropdown.setFixedSize(230, 30)
+
+        # Connect to state update
+        dropdown.currentTextChanged.connect(
+            lambda value: self.state.update_setting("camera", dropdown.currentIndex())
+        )
         return dropdown
 
-    def create_toggle_buttons(self, options):
+    def create_toggle_buttons(self, options, state_key):
         """Create a row of toggle buttons."""
         container = QWidget()
         container.setFixedSize(230, 40)
@@ -169,13 +177,19 @@ class Settings(QWidget):
             layout.addWidget(button)
             button_group.addButton(button)
 
+            # Connect each button to update state
+            button.clicked.connect(
+                lambda checked, value=option: self.state.update_setting(state_key, value) if checked else None
+            )
+
         # Set the first button as checked by default
         if button_group.buttons():
             button_group.buttons()[0].setChecked(True)
+            self.state.update_setting(state_key, options[0])
 
         return container
 
-    def create_toggle_switch(self):
+    def create_toggle_switch(self, state_key):
         """Create a toggle switch with a rounded button."""
         button_container = QWidget()
         button_container.setFixedSize(230, 40)
@@ -185,10 +199,14 @@ class Settings(QWidget):
         button_layout.setContentsMargins(0, 0, 0, 0)
 
         toggle_button = ToggleSwitch(self, width=55, height=30, on_color="#013e54", off_color="lightgray")
-        toggle_button.toggled.connect(lambda checked: print("Toggle 1:", "On" if checked else "Off"))
+        toggle_button.setChecked(self.state.get_setting(state_key))
+        toggle_button.toggled.connect(
+            lambda checked: self.state.update_setting(state_key, checked)
+        )
         button_layout.addWidget(toggle_button)
 
         return button_container
+
 
 def main():
     app = QApplication([])

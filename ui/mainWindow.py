@@ -5,6 +5,8 @@ from PySide6.QtGui import QFont ,QPixmap , QIcon
 from ui.dashboard import Dashboard
 from ui.settings import Settings
 from ui.home import Home
+from states.state import State
+
 class PostureWatcherUI(QWidget):
     def __init__(self):
         # Setup UI components
@@ -28,10 +30,12 @@ class PostureWatcherUI(QWidget):
         self.content_area.setStyleSheet("background-color: white;border-radius: 10px;")
         main_layout.addWidget(self.content_area, 10)
 
+        # Global state for whole application
+        state = State()
         # Create tabs
-        self.camera_view_tab = Home()
+        self.camera_view_tab = Home(state)
         self.dashboard_tab = Dashboard()
-        self.settings_tab = Settings()
+        self.settings_tab = Settings(state)
 
         # Add tabs to stacked widget
         self.content_area.addWidget(self.camera_view_tab)

@@ -26,7 +26,7 @@ class FrontPostureAnalyzer:
                  deviation_algorithm=2,
                  deviation_interval=5,
                  deviation_adjustment=5,
-                 deviation_threshold=25,
+                 deviation_threshold=30,
                  deviation_buffer=3,
                  base_posture=None,
                  debug=True,):
@@ -54,8 +54,8 @@ class FrontPostureAnalyzer:
         self.deviation_adjustment = deviation_adjustment
 
         self.thread = None
-        # self.debug = debug
-        # self.logger = Logger('PW')
+        self.debug = debug
+        self.logger = Logger('PW')
 
     def run(self,camera_index=0):
         """
@@ -66,7 +66,6 @@ class FrontPostureAnalyzer:
             raise Exception("Error: Cannot access the webcam.")
         
         if not self.base_posture:
-            return
             self.set_base_posture()
 
     def stop(self):
@@ -79,7 +78,7 @@ class FrontPostureAnalyzer:
     def set_base_posture(self):
         _, img = self.cap.read()
         _,lm = self.detector.find_pose(img)
-        if lm:
+        if lm is not None:
             nose = lm[PoseLandmarks.NOSE]
             mouth_l = lm[9]
             mouth_r = lm[10]
@@ -102,9 +101,29 @@ class FrontPostureAnalyzer:
         posture_data = {"status": "Unknown", "deviation": None}
 
         if keypoints.pose_landmarks:
-            self.deviation.current_deviation = self._get_deviation_from_base_posture()
-            posture_data['deviation']= self.deviation.current_deviation
-            self._handle_deviation()
+            # self.deviation.current_deviation = self._get_deviation_from_base_posture()
+            # posture_data['deviation']= self.deviation.current_deviation
+
+            cd = self._get_deviation_from_base_posture()
+            # buffer = self.deviation.current_buffer
+
+            if  cd < self.deviation.deviation_threshold:
+                posture_data["status"] = "Good"
+            else:
+                posture_data["status"] = "Bad"
+
+            # if self.deviation.has_deviated():
+            #     self.logger.notify(f"Detected deviation from base posture by {cd}%", color='red', with_sound=True)
+            # else:
+            #     if cd < 25:
+            #         self.logger.notify(f"✅ Great posture! {cd}% (Buf: {buffer})", color='green')
+            #     elif cd < 35:
+            #         self.logger.notify(f"⚠️ Improve your posture! {cd}% (Buf: {buffer})", color='yellow')
+            #     else:
+            #         self.logger.notify(f"️ Fix your posture! {cd}% (Buf: {buffer})", color='red')
+
+            # if self.debug:
+            #     self.logger.notify(f"Deviation buffer: {buffer}", color='white')
 
         return image_bgr, posture_data
 
@@ -158,34 +177,3 @@ class FrontPostureAnalyzer:
 
         adjusted_deviation = 100 if deviation >= 100 else int(deviation - self.deviation_adjustment)
         return adjusted_deviation
-
-    def _log_deviation(self, cd: int, buffer: int):
-        """
-        Logs the deviation using the built-in logging utility.
-        :return: None
-        """
-        if self.deviation.has_deviated():
-            self.logger.notify(f"Detected deviation from base posture by {cd}%", color='red', with_sound=True)
-        else:
-            if cd < 30:
-                self.logger.notify(f"✅ Great posture! {cd}% (Buf: {buffer})", color='green')
-            elif cd < 40:
-                self.logger.notify(f"⚠️ Improve your posture! {cd}% (Buf: {buffer})", color='yellow')
-            else:
-                self.logger.notify(f"️ Fix your posture! {cd}% (Buf: {buffer})", color='red')
-
-        if self.debug:
-            self.logger.notify(f"Deviation buffer: {buffer}", color='white')
-
-    def _handle_deviation(self):
-        """
-        Handles the deviation from the base posture and notifies the user if the deviation is above the threshold.
-        """
-        if self.deviation.current_deviation is None:
-            return
-
-        cd = self.deviation.current_deviation
-        buffer = self.deviation.current_buffer
-
-        # self._log_deviation(cd, buffer)
-

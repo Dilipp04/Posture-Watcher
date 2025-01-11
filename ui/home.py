@@ -1,25 +1,39 @@
 from PySide6.QtWidgets import (
-    QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QGridLayout,QFrame,QApplication
+    QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QGridLayout,QFrame,QApplication,QGraphicsDropShadowEffect
 )
 import sys
 from os import system
-from PySide6.QtCore import QTimer, Qt, QTime
+from PySide6.QtCore import QTimer, Qt, QTime,Signal
 from PySide6.QtGui import QPixmap, QImage, QFont
 from posture_detector.sidePostureAnalyzer import SidePostureAnalyzer
 from posture_detector.frontPostureAnalyzer import FrontPostureAnalyzer
+from states.state import State
 
 class Home(QFrame):
-    def __init__(self):
+    def __init__(self,state: State):
         super().__init__()
-        self.posture_analyzer = FrontPostureAnalyzer()
-        # self.posture_analyzer = SidePostureAnalyzer()
+
+        self.state = state
+        self.state.camera_angle_changed.connect(self.handle_state_change)
+        self.init_posture_analyzer()
+
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_frame)
 
-        self.clock_timer = QTimer(self)
-        self.clock_timer.timeout.connect(self.update_clock)
+        self.elapsed_time_timer = QTimer()
+        self.elapsed_time_timer.timeout.connect(self.update_elapsed_time)
+        self.elapsed_time = 0  # Initialize elapsed time
+        
 
         self.init_ui()
+
+
+    def init_posture_analyzer(self):
+        camera_angle = self.state.get_setting("camera_angle")
+        if camera_angle == "Front":
+            self.posture_analyzer = FrontPostureAnalyzer()
+        elif camera_angle == "Side":
+            self.posture_analyzer = SidePostureAnalyzer()
 
     def init_ui(self):
 
@@ -32,13 +46,18 @@ class Home(QFrame):
         # Video display
         self.video_label = QLabel(self)
         self.video_label.setFixedSize(720, 480)
-        self.video_label.setStyleSheet("background-color: #f0f0f0; border: 1px solid #d6d6d6;")
+        self.video_label.setStyleSheet(f"background-color: #f0f0f0; border: 5px solid black;")
         self.video_label.setAlignment(Qt.AlignCenter)
 
-        # Clock display
-        self.clock_label = QLabel(self)
-        self.clock_label.setAlignment(Qt.AlignCenter)
-        self.clock_label.setFont(QFont("Arial", 16))
+        # Timer label to display elapsed time
+        self.timer_label = QLabel("00:00", self)
+        self.timer_label.setAlignment(Qt.AlignCenter)
+        self.timer_label.setFont(QFont("Arial", 16))
+        self.timer_label.setStyleSheet("color:black")
+
+        self.status_label = QLabel(self)
+        self.status_label.setAlignment(Qt.AlignCenter)
+        self.status_label.setFont(QFont("Arial", 16))
         self.setStyleSheet("color:black")
 
         # Buttons
@@ -64,30 +83,47 @@ class Home(QFrame):
         main_layout.addWidget(self.video_label, alignment=Qt.AlignCenter)
 
         # Add clock
-        main_layout.addWidget(self.clock_label, alignment=Qt.AlignCenter)
+        main_layout.addWidget(self.timer_label, alignment=Qt.AlignCenter)
+        main_layout.addWidget(self.status_label, alignment=Qt.AlignCenter)
 
         # Add buttons
         button_layout = QHBoxLayout()
+        button_layout.setAlignment(Qt.AlignCenter)
         button_layout.addWidget(self.start_button)
         button_layout.addWidget(self.set_base_button)
         button_layout.addWidget(self.stop_button)
         main_layout.addLayout(button_layout)
 
         self.setLayout(main_layout)
+        
+    def handle_state_change(self):
+        """Handle changes in the state dynamically."""
+        try:
+            # Reinitialize the posture analyzer if the state has changed
+            self.init_posture_analyzer()
+            self.update_ui()
+            self.video_label.setText("State updated. Ready to start monitoring.")
+        except Exception as e:
+            self.video_label.setText(f"Error: {e}")
 
-        # Start clock timer
-        self.clock_timer.start(1000)  # Update clock every second
-        self.update_clock()
+    def update_ui(self):
+        if self.state.get_setting("camera_angle")=="Side":
+            self.set_base_button.setHidden(True)
+        else:
+            self.set_base_button.setHidden(False)
 
     def start_monitoring(self):
         try:
-            self.posture_analyzer.run()
+            self.video_label.setText("Loading")
+            self.elapsed_time_timer.start(1000)
+            self.posture_analyzer.run(self.state.get_setting("camera"))
             self.timer.start(30)  # 30ms for ~33 FPS
         except Exception as e:
             self.video_label.setText(str(e))
 
     def stop_monitoring(self):
         self.timer.stop()
+        self.elapsed_time_timer.stop() 
         self.posture_analyzer.stop()
         self.video_label.setText("Monitoring stopped.")
 
@@ -98,7 +134,14 @@ class Home(QFrame):
 
     def update_frame(self):
         frame, posture_data = self.posture_analyzer.process_frame()
-        
+
+        if posture_data["status"] =="Good":
+            self.status_label.setText("Posture Status: Good ✅")
+            self.video_label.setStyleSheet("border: 5px solid Green;")
+        else:
+            self.status_label.setText("Posture Status: Bad ❌")
+            self.video_label.setStyleSheet("border: 5px solid red;")
+
         if frame is not None:
             height, width, channel = frame.shape
             bytes_per_line = channel * width
@@ -107,9 +150,11 @@ class Home(QFrame):
         else:
             self.video_label.setText("No frame available.")
 
-    def update_clock(self):
-        current_time = QTime.currentTime().toString("hh:mm:ss")
-        self.clock_label.setText(current_time)
+    def update_elapsed_time(self):
+        # Update the elapsed time and display it in the timer label
+        self.elapsed_time += 1
+        minutes, seconds = divmod(self.elapsed_time, 60)
+        self.timer_label.setText(f"{minutes:02}:{seconds:02}")
 
 def main():
     app = QApplication(sys.argv)

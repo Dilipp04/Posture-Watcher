@@ -6,7 +6,7 @@ class Deviation:
     Handles the deviation from base posture.
     """
 
-    def __init__(self, threshold=30, max_buffer=0):
+    def __init__(self, threshold=40, max_buffer=0):
         """
         Initializes the deviation instance
         :param threshold: The threshold for deviation on a scale of 0-100.
