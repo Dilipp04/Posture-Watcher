@@ -5,7 +5,7 @@ from PySide6.QtGui import QFont, QPixmap
 from PySide6.QtCore import Qt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
-
+import csv
 
 class Dashboard(QWidget):
 
@@ -14,10 +14,26 @@ class Dashboard(QWidget):
         self.bg_color = "#e0f7fa"
         self.text_color = "#000000"
         self.setWindowTitle("Dashboard")
-        self.setMinimumSize(1000, 700)
         self.setStyleSheet(f"background-color:white;color:{self.text_color};")
-
+        self.data_file = "history.csv"
+        self.data = self.load_data()
         self.setup_ui()
+
+    def load_data(self):
+        """Load data from the given CSV file."""
+        data = []
+        try:
+            with open(self.data_file, "r") as file:
+                reader = csv.DictReader(file)
+                for row in reader:
+                    data.append({
+                        "date": row["Date"],
+                        "total_minutes": float(row["Total Minutes"]),
+                        "good_posture_minutes": float(row["Good Posture Minutes"]),
+                    })
+        except FileNotFoundError:
+            print(f"File {self.data_file} not found.")
+        return data[-7:]  # Return only the last 7 days
 
     def setup_ui(self):
         # Main layout
@@ -31,7 +47,7 @@ class Dashboard(QWidget):
 
         # Header Section
         header = QWidget()
-        header.setStyleSheet("background-color: #e0f7fa; border-radius: 10px; padding: 20px;")
+        header.setStyleSheet("background-color: #e0f7fa; border-radius: 10px; padding: 5px;")
         header_layout = QHBoxLayout(header)
 
         header_label = QLabel("Hii Good Morning")
@@ -47,11 +63,13 @@ class Dashboard(QWidget):
         header_layout.addWidget(header_image)
         main_layout.addWidget(header)
 
+
         # Statistics Row
         stats_layout = QHBoxLayout()
-        stats_layout.addWidget(self.create_stat_card("Today's", 72, "Success", self.bg_color))
-        stats_layout.addWidget(self.create_stat_card("Total", 45, "Success", self.bg_color))
-        stats_layout.addWidget(self.create_stat_card("Achievement", 72, "Goal", self.bg_color))
+
+        stats_layout.addWidget(self.create_stat_card("Today's", self.get_today(), "Success", self.bg_color))
+        stats_layout.addWidget(self.create_stat_card("Total", self.get_total(), "Success", self.bg_color))
+        stats_layout.addWidget(self.create_Achivement_card("Achievement",  "Goal", self.bg_color))
 
         main_layout.addLayout(stats_layout)
 
@@ -59,25 +77,17 @@ class Dashboard(QWidget):
         bottom_layout = QHBoxLayout()
         bottom_layout.setSpacing(15)
 
-        weekly_data = [
-        {"day": "Sun", "percentage": 50},
-        {"day": "Mon", "percentage": 60},
-        {"day": "Tue", "percentage": 70},
-        {"day": "Wed", "percentage": 65},
-        {"day": "Thu", "percentage": 80},
-        {"day": "Fri", "percentage": 90},
-        {"day": "Sat", "percentage": 85}
-    ]
-
-        bottom_layout.addWidget(self.create_progress_card("Progress this Week",weekly_data, self.bg_color))
-        bottom_layout.addWidget(self.create_progress_card("Usage this Week",weekly_data, self.bg_color))
+        bottom_layout.addWidget(self.create_progress_card("Progress this Week",self.data, self.bg_color))
+        bottom_layout.addWidget(self.create_progress_card("Usage this Week",self.data, self.bg_color))
 
         main_layout.addLayout(bottom_layout)
 
-    def create_stat_card(self, title, value, subtitle, bg_color):
+    
+
+    def create_stat_card(self, title, value,subtitle, bg_color):
         card = QFrame()
         card.setFrameShape(QFrame.StyledPanel)
-        card.setStyleSheet(f"background-color: {bg_color}; border-radius: 10px;padding: 10px;")
+        card.setStyleSheet(f"background-color: {bg_color}; border-radius: 10px;padding: 3px;")
         layout = QHBoxLayout(card)  # Use horizontal layout to align text and chart
         layout.setContentsMargins(15, 15, 15, 15)
         layout.setSpacing(10)
@@ -89,8 +99,8 @@ class Dashboard(QWidget):
         title_label.setFont(QFont("Arial", 12, QFont.Bold))
         title_label.setAlignment(Qt.AlignLeft)
 
-        value_label = QLabel(f"{value}%")
-        value_label.setFont(QFont("Arial", 28, QFont.Bold))
+        value_label = QLabel(f"{value}")
+        value_label.setFont(QFont("Arial", 25, QFont.Bold))
         value_label.setAlignment(Qt.AlignLeft)
 
         subtitle_label = QLabel(subtitle)
@@ -108,6 +118,48 @@ class Dashboard(QWidget):
         layout.addWidget(donut_chart, alignment=Qt.AlignRight)
 
         return card
+
+    def create_Achivement_card(self, title, subtitle, bg_color):
+        card = QFrame()
+        card.setFrameShape(QFrame.StyledPanel)
+        card.setStyleSheet(f"background-color: {bg_color}; border-radius: 10px;padding: 3px;")
+        layout = QHBoxLayout(card)  # Use horizontal layout to align text and chart
+        layout.setContentsMargins(15, 15, 15, 15)
+        layout.setSpacing(10)
+
+        # Left Side: Title, Value, and Subtitle
+        text_layout = QVBoxLayout()
+
+        title_label = QLabel(title)
+        title_label.setFont(QFont("Arial", 12, QFont.Bold))
+        title_label.setAlignment(Qt.AlignLeft)
+
+        result = self.get_total()
+        if result>80 :
+            value= "Excellent"
+        elif result>70 :
+            value="Good"
+        elif result>50 :
+            value="Average"
+        else :
+            value="Poor"
+
+        value_label = QLabel(value)
+        value_label.setFont(QFont("Arial", 25, QFont.Bold))
+        value_label.setAlignment(Qt.AlignLeft)
+
+        subtitle_label = QLabel(subtitle)
+        subtitle_label.setFont(QFont("Arial", 10))
+        subtitle_label.setAlignment(Qt.AlignLeft)
+
+        text_layout.addWidget(title_label)
+        text_layout.addWidget(value_label)
+        text_layout.addWidget(subtitle_label)
+
+        layout.addLayout(text_layout)
+
+        return card
+
 
     def create_donut_chart(self, percentage):
         # Create a Matplotlib figure for the donut chart
@@ -150,13 +202,15 @@ class Dashboard(QWidget):
         for day_data in weekly_data:
             day_layout = QHBoxLayout()
 
-            day_label = QLabel(day_data["day"])
+            day_label = QLabel(f"{day_data["date"].split(" ")[0]} {day_data["date"].split(" ")[1]}")  # Use data value
             day_label.setFont(QFont("Arial", 10))
             day_label.setAlignment(Qt.AlignLeft)
 
+            percentage = self.get_percentage(day_data["good_posture_minutes"], day_data["total_minutes"])
+
             progress_bar = QProgressBar()
             progress_bar.setAlignment(Qt.AlignRight)
-            progress_bar.setValue(day_data["percentage"])  # Use data value
+            progress_bar.setValue(percentage)  # Use data value
             progress_bar.setFixedHeight(6)
             progress_bar.setTextVisible(False)
             progress_bar.setStyleSheet(
@@ -181,6 +235,25 @@ class Dashboard(QWidget):
         layout.addLayout(progress_layout)
 
         return card
+
+    def get_today(self):
+        result = self.get_percentage(self.data[-1]["good_posture_minutes"],self.data[-1]["total_minutes"])
+        return round(result,2)
+    
+    def get_total(self):
+        sum_TM = 0
+        sum_GM = 0
+        for day in self.data:
+            sum_TM += day["total_minutes"]
+            sum_GM += day["good_posture_minutes"]
+        result = self.get_percentage(sum_GM,sum_TM)
+        return round(result,2)
+      
+        
+    @staticmethod
+    def get_percentage(good_posture_minutes, total_minutes):
+        result =  ( good_posture_minutes/ total_minutes * 100) if total_minutes > 0 else 0
+        return result
 
 def main():
     import sys

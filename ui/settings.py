@@ -5,7 +5,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
 from components.ToggleSwitch import ToggleSwitch
-from states.state import State
+from utilities.state import State
 
 class Settings(QWidget):
     def __init__(self,state:State):
@@ -24,7 +24,7 @@ class Settings(QWidget):
         # Create QListWidget
         self.list_widget = QListWidget()
         self.list_widget.setStyleSheet("QListWidget { border: none; }")
-        self.list_widget.setSpacing(15)
+        self.list_widget.setSpacing(10)
         main_layout.addWidget(self.list_widget)
 
         # Add sections to the QListWidget

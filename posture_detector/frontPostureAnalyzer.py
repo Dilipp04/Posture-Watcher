@@ -43,6 +43,8 @@ class FrontPostureAnalyzer:
         self.detector = PoseDetector()
         self.deviation = Deviation(threshold=deviation_threshold, max_buffer=deviation_buffer)
 
+        self.fps = 30  # Default FPS
+
         self.cap = cv2.VideoCapture(0)
         # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 720)
         # self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
@@ -67,6 +69,7 @@ class FrontPostureAnalyzer:
         
         if not self.base_posture:
             self.set_base_posture()
+        self.fps = int(self.cap.get(cv2.CAP_PROP_FPS))
 
     def stop(self):
         """

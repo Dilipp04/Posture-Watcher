@@ -5,8 +5,7 @@ from PySide6.QtGui import QFont ,QPixmap , QIcon
 from ui.dashboard import Dashboard
 from ui.settings import Settings
 from ui.home import Home
-from states.state import State
-
+from utilities.state import State
 class PostureWatcherUI(QWidget):
     def __init__(self):
         # Setup UI components
@@ -15,7 +14,7 @@ class PostureWatcherUI(QWidget):
     def init_ui(self):
         super().__init__()
         self.setWindowTitle("Posture Watcher")
-        self.setGeometry(100, 100, 1200, 800)
+        self.setMinimumSize(1000, 700)
         self.setWindowIcon(QIcon("assets/window-icon.png"))
 
         main_layout = QHBoxLayout(self)

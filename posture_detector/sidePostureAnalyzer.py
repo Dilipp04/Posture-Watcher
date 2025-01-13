@@ -16,6 +16,7 @@ class SidePostureAnalyzer:
         if not self.cap.isOpened():
             raise Exception("Error: Cannot access the webcam.")
         self.fps = int(self.cap.get(cv2.CAP_PROP_FPS))
+        print(f"FPS: {self.fps}")
 
     def stop(self):
         if self.cap:

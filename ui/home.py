@@ -1,16 +1,19 @@
+import csv
+from datetime import datetime
 from PySide6.QtWidgets import (
-    QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QGridLayout,QFrame,QApplication,QGraphicsDropShadowEffect
+    QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QFrame, QApplication, QGraphicsDropShadowEffect
 )
 import sys
-from os import system
-from PySide6.QtCore import QTimer, Qt, QTime,Signal
+from os import path
+from PySide6.QtCore import QTimer, Qt
 from PySide6.QtGui import QPixmap, QImage, QFont
 from posture_detector.sidePostureAnalyzer import SidePostureAnalyzer
 from posture_detector.frontPostureAnalyzer import FrontPostureAnalyzer
-from states.state import State
+from utilities.state import State
+
 
 class Home(QFrame):
-    def __init__(self,state: State):
+    def __init__(self, state: State):
         super().__init__()
 
         self.state = state
@@ -23,10 +26,9 @@ class Home(QFrame):
         self.elapsed_time_timer = QTimer()
         self.elapsed_time_timer.timeout.connect(self.update_elapsed_time)
         self.elapsed_time = 0  # Initialize elapsed time
-        
+        self.good_posture_minutes = 0  # Track good posture minutes
 
         self.init_ui()
-
 
     def init_posture_analyzer(self):
         camera_angle = self.state.get_setting("camera_angle")
@@ -36,11 +38,10 @@ class Home(QFrame):
             self.posture_analyzer = SidePostureAnalyzer()
 
     def init_ui(self):
-
         # Title
         title = QLabel("Posture Analyzer")
         title.setFont(QFont("Arial", 20, QFont.Bold))
-        title.setStyleSheet("margin:15px 10px; padding: 10px;")
+        title.setStyleSheet("margin:10px 10px; padding: 10px;")
         title.setAlignment(Qt.AlignLeft)
 
         # Video display
@@ -95,11 +96,10 @@ class Home(QFrame):
         main_layout.addLayout(button_layout)
 
         self.setLayout(main_layout)
-        
+
     def handle_state_change(self):
         """Handle changes in the state dynamically."""
         try:
-            # Reinitialize the posture analyzer if the state has changed
             self.init_posture_analyzer()
             self.update_ui()
             self.video_label.setText("Restart monitoring.")
@@ -107,7 +107,7 @@ class Home(QFrame):
             self.video_label.setText(f"Error: {e}")
 
     def update_ui(self):
-        if self.state.get_setting("camera_angle")=="Side":
+        if self.state.get_setting("camera_angle") == "Side":
             self.set_base_button.setHidden(True)
         else:
             self.set_base_button.setHidden(False)
@@ -123,21 +123,28 @@ class Home(QFrame):
 
     def stop_monitoring(self):
         self.timer.stop()
-        self.elapsed_time_timer.stop() 
+        self.elapsed_time_timer.stop()
         self.posture_analyzer.stop()
         self.video_label.setText("Monitoring stopped.")
 
+        # Save session data to history
+        self.save_history()
+
+        # Reset elapsed time and good posture minutes
+        self.elapsed_time = 0
+        self.good_posture_minutes = 0
+
     def set_base_posture(self):
-        # Logic to set the base posture
         self.posture_analyzer.set_base_posture()
         self.video_label.setText("Base posture set.")
 
     def update_frame(self):
         frame, posture_data = self.posture_analyzer.process_frame()
 
-        if posture_data["status"] =="Good":
+        if posture_data["status"] == "Good":
             self.status_label.setText("Posture Status: Good ✅")
             self.video_label.setStyleSheet("border: 5px solid Green;")
+            self.good_posture_minutes += (1 / (30 * 60))# Increment good posture minutes
         else:
             self.status_label.setText("Posture Status: Bad ❌")
             self.video_label.setStyleSheet("border: 5px solid red;")
@@ -151,14 +158,48 @@ class Home(QFrame):
             self.video_label.setText("No frame available.")
 
     def update_elapsed_time(self):
-        # Update the elapsed time and display it in the timer label
         self.elapsed_time += 1
         minutes, seconds = divmod(self.elapsed_time, 60)
         self.timer_label.setText(f"{minutes:02}:{seconds:02}")
 
+    def save_history(self):
+        """Save session data to history.csv."""
+        file_path = "history.csv"
+        current_date = datetime.now().strftime("%d %b %Y")
+        total_minutes = self.elapsed_time / 60  # Convert seconds to minutes
+
+        # Prepare data
+        new_total_minutes = round(total_minutes, 2)
+        new_good_minutes = round(self.good_posture_minutes, 2)
+
+        # Read existing data
+        if path.exists(file_path):
+            with open(file_path, mode="r", newline="") as file:
+                reader = csv.reader(file)
+                data = list(reader)
+        else:
+            data = [["Date", "Total Minutes", "Good Posture Minutes"]]
+
+        # Update existing entry or add new one
+        updated = False
+        row= data[-1]
+        if  row[0] == current_date :  # Match by date
+            row[1] = str(round(float(row[1]) + new_total_minutes, 2))  # Update total minutes
+            row[2] = str(round(float(row[2]) + new_good_minutes, 2))  # Update good posture minutes
+            updated = True
+
+        if not updated:  # If no entry for the current date exists, add a new one
+            data.append([current_date, str(new_total_minutes), str(new_good_minutes)])
+
+        # Write updated data back to the CSV
+        with open(file_path, mode="w", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerows(data)
+
 def main():
     app = QApplication(sys.argv)
-    mainWin = Home()
+    state = State()  # Initialize state object
+    mainWin = Home(state)
     mainWin.show()
     sys.exit(app.exec())
 
