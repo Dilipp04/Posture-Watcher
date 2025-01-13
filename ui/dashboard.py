@@ -12,7 +12,7 @@ class Dashboard(QWidget):
     def __init__(self):
         super().__init__()
         self.bg_color = "#e0f7fa"
-        self.text_color = "#000000"
+        self.text_color = "#013e54"
         self.setWindowTitle("Dashboard")
         self.setStyleSheet(f"background-color:white;color:{self.text_color};")
         self.data_file = "history.csv"
@@ -189,7 +189,7 @@ class Dashboard(QWidget):
     def create_progress_card(self, title, weekly_data, bg_color):
         card = QFrame()
         card.setFrameShape(QFrame.StyledPanel)
-        card.setStyleSheet(f"background-color: {bg_color}; border-radius: 10px;")
+        card.setStyleSheet(f"background-color: {bg_color}; border-radius: 10px; ")
         layout = QVBoxLayout(card)
         layout.setContentsMargins(15, 15, 15, 15)
         layout.setSpacing(10)
@@ -207,6 +207,10 @@ class Dashboard(QWidget):
             day_label.setAlignment(Qt.AlignLeft)
 
             percentage = self.get_percentage(day_data["good_posture_minutes"], day_data["total_minutes"])
+
+            percent_label = QLabel(f"{percentage}%")  # Use data value
+            percent_label.setFont(QFont("Arial", 10))
+            percent_label.setAlignment(Qt.AlignLeft)
 
             progress_bar = QProgressBar()
             progress_bar.setAlignment(Qt.AlignRight)
@@ -229,6 +233,7 @@ class Dashboard(QWidget):
 
             day_layout.addWidget(day_label, 1)
             day_layout.addWidget(progress_bar, 10)
+            day_layout.addWidget(percent_label, 1)
             progress_layout.addLayout(day_layout)
 
         layout.addWidget(title_label)
@@ -247,13 +252,13 @@ class Dashboard(QWidget):
             sum_TM += day["total_minutes"]
             sum_GM += day["good_posture_minutes"]
         result = self.get_percentage(sum_GM,sum_TM)
-        return round(result,2)
+        return result
       
         
     @staticmethod
     def get_percentage(good_posture_minutes, total_minutes):
         result =  ( good_posture_minutes/ total_minutes * 100) if total_minutes > 0 else 0
-        return result
+        return round(result,2)
 
 def main():
     import sys
