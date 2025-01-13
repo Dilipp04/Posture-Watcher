@@ -59,8 +59,18 @@ class Dashboard(QWidget):
         bottom_layout = QHBoxLayout()
         bottom_layout.setSpacing(15)
 
-        bottom_layout.addWidget(self.create_progress_card("Progress this Week", self.bg_color))
-        bottom_layout.addWidget(self.create_progress_card("Usage this Week", self.bg_color))
+        weekly_data = [
+        {"day": "Sun", "percentage": 50},
+        {"day": "Mon", "percentage": 60},
+        {"day": "Tue", "percentage": 70},
+        {"day": "Wed", "percentage": 65},
+        {"day": "Thu", "percentage": 80},
+        {"day": "Fri", "percentage": 90},
+        {"day": "Sat", "percentage": 85}
+    ]
+
+        bottom_layout.addWidget(self.create_progress_card("Progress this Week",weekly_data, self.bg_color))
+        bottom_layout.addWidget(self.create_progress_card("Usage this Week",weekly_data, self.bg_color))
 
         main_layout.addLayout(bottom_layout)
 
@@ -124,7 +134,7 @@ class Dashboard(QWidget):
 
         return canvas
 
-    def create_progress_card(self, title, bg_color):
+    def create_progress_card(self, title, weekly_data, bg_color):
         card = QFrame()
         card.setFrameShape(QFrame.StyledPanel)
         card.setStyleSheet(f"background-color: {bg_color}; border-radius: 10px;")
@@ -137,25 +147,18 @@ class Dashboard(QWidget):
         title_label.setAlignment(Qt.AlignLeft)
 
         progress_layout = QVBoxLayout()
-        for i, day in enumerate(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]):
-            # Create a horizontal layout for each day
+        for day_data in weekly_data:
             day_layout = QHBoxLayout()
 
-            # Add a day label
-            day_label = QLabel(f"{i+1} {day}")
+            day_label = QLabel(day_data["day"])
             day_label.setFont(QFont("Arial", 10))
             day_label.setAlignment(Qt.AlignLeft)
 
-            progress_prct_label = QLabel(f" 50%")
-            progress_prct_label.setFont(QFont("Arial", 10))
-            progress_prct_label.setAlignment(Qt.AlignRight)
-
-            # Add a progress bar
             progress_bar = QProgressBar()
             progress_bar.setAlignment(Qt.AlignRight)
-            progress_bar.setValue(50)  # Simulate 50% progress
-            progress_bar.setFixedHeight(6)  # Adjust the height of the progress bar
-            progress_bar.setTextVisible(False)  # Hide the percentage text
+            progress_bar.setValue(day_data["percentage"])  # Use data value
+            progress_bar.setFixedHeight(6)
+            progress_bar.setTextVisible(False)
             progress_bar.setStyleSheet(
                 """
                 QProgressBar {
@@ -170,19 +173,14 @@ class Dashboard(QWidget):
                 """
             )
 
-            # Add widgets to the horizontal layout
-            day_layout.addWidget(day_label, 1)  # Day label takes less space
-            day_layout.addWidget(progress_prct_label, 1)  # Day label takes less space
-            day_layout.addWidget(progress_bar, 10)  # Progress bar takes more space
-
-            # Add the horizontal layout to the main progress layout
+            day_layout.addWidget(day_label, 1)
+            day_layout.addWidget(progress_bar, 10)
             progress_layout.addLayout(day_layout)
 
         layout.addWidget(title_label)
         layout.addLayout(progress_layout)
 
         return card
-
 
 def main():
     import sys

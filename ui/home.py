@@ -102,7 +102,7 @@ class Home(QFrame):
             # Reinitialize the posture analyzer if the state has changed
             self.init_posture_analyzer()
             self.update_ui()
-            self.video_label.setText("State updated. Ready to start monitoring.")
+            self.video_label.setText("Restart monitoring.")
         except Exception as e:
             self.video_label.setText(f"Error: {e}")
 
