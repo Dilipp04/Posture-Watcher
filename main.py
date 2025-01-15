@@ -11,7 +11,7 @@ class StartUpAnimationWindow(QMainWindow):
         # Window setup for the startup animation (no borders)
         self.setWindowTitle("PostureWatcher - Start Up Animation")
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)  # No window borders, stays on top
-
+        self.setAttribute(Qt.WA_TranslucentBackground)
         # Get screen geometry and center the window
         screen_geometry = QApplication.primaryScreen().geometry()
         window_width, window_height = 800, 500
@@ -20,7 +20,7 @@ class StartUpAnimationWindow(QMainWindow):
         self.setGeometry(x, y, window_width, window_height)
 
         # Apply a stylesheet for the background
-        self.setStyleSheet("background-color: #013e54;")  # Replace with desired color or image
+        self.setStyleSheet("background-color: #013e54;border-radius:10px")  # Replace with desired color or image
 
         # Central widget to hold layout
         central_widget = QWidget(self)

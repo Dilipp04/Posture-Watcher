@@ -66,7 +66,7 @@ class FrontPostureAnalyzer:
         self.cap = cv2.VideoCapture(camera_index)
         if not self.cap.isOpened():
             raise Exception("Error: Cannot access the webcam.")
-        
+
         if not self.base_posture:
             self.set_base_posture()
         self.fps = int(self.cap.get(cv2.CAP_PROP_FPS))

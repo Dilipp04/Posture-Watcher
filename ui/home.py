@@ -4,9 +4,9 @@ from PySide6.QtWidgets import (
     QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QFrame, QApplication, QGraphicsDropShadowEffect
 )
 import sys
-from os import path
-from PySide6.QtCore import QTimer, Qt
-from PySide6.QtGui import QPixmap, QImage, QFont
+from os import path , system
+from PySide6.QtCore import QTimer, Qt, QSize
+from PySide6.QtGui import QPixmap, QImage, QFont, QIcon
 from posture_detector.sidePostureAnalyzer import SidePostureAnalyzer
 from posture_detector.frontPostureAnalyzer import FrontPostureAnalyzer
 from utilities.state import State
@@ -64,17 +64,17 @@ class Home(QFrame):
         # Buttons
         self.start_button = QPushButton("Start", self)
         self.start_button.setFixedSize(120, 40)
-        self.start_button.setStyleSheet("background-color: #003d4d; color: white;")
+        self.start_button.setStyleSheet("background-color: #003d4d; color: white;font-weight:bold;")
         self.start_button.clicked.connect(self.start_monitoring)
 
         self.set_base_button = QPushButton("Set base posture", self)
         self.set_base_button.setFixedSize(120, 40)
-        self.set_base_button.setStyleSheet("background-color: #003d4d; color: white;")
+        self.set_base_button.setStyleSheet("background-color: #003d4d; color: white;font-weight:bold;")
         self.set_base_button.clicked.connect(self.set_base_posture)
 
         self.stop_button = QPushButton("Stop", self)
         self.stop_button.setFixedSize(120, 40)
-        self.stop_button.setStyleSheet("background-color: #003d4d; color: white;")
+        self.stop_button.setStyleSheet("background-color: #003d4d; color: white;font-weight:bold;")
         self.stop_button.clicked.connect(self.stop_monitoring)
 
         # Layout setup
@@ -115,8 +115,8 @@ class Home(QFrame):
     def start_monitoring(self):
         try:
             self.video_label.setText("Loading")
-            self.elapsed_time_timer.start(1000)
             self.posture_analyzer.run(self.state.get_setting("camera"))
+            self.elapsed_time_timer.start(1000)
             self.timer.start(30)  # 30ms for ~33 FPS
         except Exception as e:
             self.video_label.setText(str(e))
@@ -140,7 +140,6 @@ class Home(QFrame):
 
     def update_frame(self):
         frame, posture_data = self.posture_analyzer.process_frame()
-
         if posture_data["status"] == "Good":
             self.status_label.setText("Posture Status: Good ✅")
             self.video_label.setStyleSheet("border: 5px solid Green;")

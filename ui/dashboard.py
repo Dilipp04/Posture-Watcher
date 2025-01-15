@@ -258,7 +258,7 @@ class Dashboard(QWidget):
     @staticmethod
     def get_percentage(good_posture_minutes, total_minutes):
         result =  ( good_posture_minutes/ total_minutes * 100) if total_minutes > 0 else 0
-        return round(result,2)
+        return round(result,1)
 
 def main():
     import sys

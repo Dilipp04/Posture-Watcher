@@ -1,11 +1,14 @@
 import sys
 from PySide6.QtWidgets import QWidget, QVBoxLayout,QStackedWidget, QLabel, QProgressBar, QFrame, QHBoxLayout , QApplication ,QPushButton
-from PySide6.QtCore import Qt 
+from PySide6.QtCore import Qt , QSize
 from PySide6.QtGui import QFont ,QPixmap , QIcon
 from ui.dashboard import Dashboard
 from ui.settings import Settings
 from ui.home import Home
 from utilities.state import State
+from ui.miniWindow import MiniWindow
+
+
 class PostureWatcherUI(QWidget):
     def __init__(self):
         # Setup UI components
@@ -14,7 +17,7 @@ class PostureWatcherUI(QWidget):
     def init_ui(self):
         super().__init__()
         self.setWindowTitle("Posture Watcher")
-        self.setMinimumSize(1000, 700)
+        self.setMinimumSize(1000, 720)
         self.setWindowIcon(QIcon("assets/window-icon.png"))
 
         main_layout = QHBoxLayout(self)
@@ -32,12 +35,12 @@ class PostureWatcherUI(QWidget):
         # Global state for whole application
         state = State()
         # Create tabs
-        self.camera_view_tab = Home(state)
+        self.home = Home(state)
         self.dashboard_tab = Dashboard()
         self.settings_tab = Settings(state)
 
         # Add tabs to stacked widget
-        self.content_area.addWidget(self.camera_view_tab)
+        self.content_area.addWidget(self.home)
         self.content_area.addWidget(self.dashboard_tab)
         self.content_area.addWidget(self.settings_tab)
     
@@ -100,6 +103,15 @@ class PostureWatcherUI(QWidget):
             button.clicked.connect(lambda _, idx=index: self.switch_tab(idx, active_style, inactive_style))
 
         sidebar_layout.addStretch()
+
+        image_button = QPushButton(self)
+        image_button.setText("Minimize")
+        image_button.setIcon(QIcon("assets/minimize_icon.svg"))  # Path to your image
+        image_button.setIconSize(QPixmap(icon_path).scaled(20, 20, Qt.KeepAspectRatio).size())
+        image_button.setStyleSheet(inactive_style) 
+        image_button.clicked.connect(self.showMinimized)
+        sidebar_layout.addWidget(image_button)
+
         return sidebar
 
     def switch_tab(self, index, active_style, inactive_style):
@@ -112,6 +124,11 @@ class PostureWatcherUI(QWidget):
                 button.setStyleSheet(active_style)
             else:
                 button.setStyleSheet(inactive_style)
+
+    def showMinimized(self):
+        self.MiniWindow = MiniWindow(self)
+        self.MiniWindow.show()
+        self.hide()
 
 def main():
     app = QApplication(sys.argv)
