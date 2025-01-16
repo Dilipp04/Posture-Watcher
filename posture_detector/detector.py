@@ -2,10 +2,6 @@ import cv2
 import mediapipe as mp
 
 class PoseLandmarks:
-    """
-    Indexes for Mediapipe Pose Landmarks
-    :reference: https://google.github.io/mediapipe/images/mobile/pose_tracking_full_body_landmarks.png
-    """
     NOSE = 0
     MOUTH_LEFT = 9
     MOUTH_RIGHT = 10
@@ -16,7 +12,6 @@ class PoseDetector:
     """
     PoseDetector is a wrapper for the Mediapipe Pose component.
     """
-    
     def __init__(self):
         self.results = None
         self.mpDraw = mp.solutions.drawing_utils

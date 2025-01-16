@@ -1,13 +1,8 @@
 import cv2
 from posture_detector.detector import PoseDetector, PoseLandmarks
 from posture_detector.deviation import Deviation
-from posture_detector.logger import Logger
-
 
 class BasePosture:
-    """
-    Wrapper for Mediapipe Pose Landmarks
-    """
     def __init__(self, nose: float, mouth_right: float, mouth_left: float, left_shoulder: float, right_shoulder: float):
         self.nose = nose
         self.mouth_left = mouth_left
@@ -17,47 +12,14 @@ class BasePosture:
 
 
 class FrontPostureAnalyzer:
-    """
-    PostureWatcher is responsible for monitoring the posture of a user.
-    It uses PoseDetector to compare the user's current posture to the base posture.
-    """
-
-    def __init__(self,
-                 deviation_algorithm=2,
-                 deviation_interval=5,
-                 deviation_adjustment=5,
-                 deviation_threshold=30,
-                 deviation_buffer=3,
-                 base_posture=None,
-                 debug=True,):
-        """
-        Initializes the PostureWatcher.
-        :param deviation_algorithm: The algorithm used to calculate the deviation.
-        :param deviation_interval: The interval in seconds between checking for deviation
-        :param deviation_adjustment: The amount of deviation to allow before triggering an alert
-        :param deviation_threshold: The threshold at which a deviation should trigger an alert
-        :param deviation_buffer: The number of consecutive deviations to allow before triggering an alert
-        :param base_posture: The base posture to compare to
-        :param debug: Whether to print debug messages
-        """
+    def __init__(self,base_posture=None):
+        
         self.detector = PoseDetector()
-        self.deviation = Deviation(threshold=deviation_threshold, max_buffer=deviation_buffer)
-
+        self.threshold = 30
+        self.deviation_adjustment =5
         self.fps = 30  # Default FPS
-
         self.cap = cv2.VideoCapture(0)
-        # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 720)
-        # self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-        self.last_fps_calc_timestamp = 0
-
         self.base_posture = base_posture
-        self.deviation_algorithm = deviation_algorithm
-        self.deviation_interval = deviation_interval
-        self.deviation_adjustment = deviation_adjustment
-
-        self.thread = None
-        self.debug = debug
-        self.logger = Logger('PW')
 
     def run(self,camera_index=0):
         """
@@ -104,29 +66,12 @@ class FrontPostureAnalyzer:
         posture_data = {"status": "Unknown", "deviation": None}
 
         if keypoints.pose_landmarks:
-            # self.deviation.current_deviation = self._get_deviation_from_base_posture()
-            # posture_data['deviation']= self.deviation.current_deviation
-
             cd = self._get_deviation_from_base_posture()
-            # buffer = self.deviation.current_buffer
 
-            if  cd < self.deviation.deviation_threshold:
+            if  cd < self.threshold:
                 posture_data["status"] = "Good"
             else:
                 posture_data["status"] = "Bad"
-
-            # if self.deviation.has_deviated():
-            #     self.logger.notify(f"Detected deviation from base posture by {cd}%", color='red', with_sound=True)
-            # else:
-            #     if cd < 25:
-            #         self.logger.notify(f"✅ Great posture! {cd}% (Buf: {buffer})", color='green')
-            #     elif cd < 35:
-            #         self.logger.notify(f"⚠️ Improve your posture! {cd}% (Buf: {buffer})", color='yellow')
-            #     else:
-            #         self.logger.notify(f"️ Fix your posture! {cd}% (Buf: {buffer})", color='red')
-
-            # if self.debug:
-            #     self.logger.notify(f"Deviation buffer: {buffer}", color='white')
 
         return image_bgr, posture_data
 

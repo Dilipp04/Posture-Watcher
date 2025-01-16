@@ -139,7 +139,7 @@ class Home(QFrame):
         self.video_label.setText("Base posture set.")
 
     def update_frame(self):
-        frame, posture_data = self.posture_analyzer.process_frame()
+        frame, posture_data = self.posture_analyzer.process_frame()     
         if posture_data["status"] == "Good":
             self.status_label.setText("Posture Status: Good ✅")
             self.video_label.setStyleSheet("border: 5px solid Green;")

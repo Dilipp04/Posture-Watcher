@@ -16,7 +16,7 @@ class MiniWindow(QWidget):
         self.is_dragging = False
 
     def init_ui(self):
-        self.setFixedSize(250, 40)
+        self.setFixedSize(230, 40)
         self.setStyleSheet("background-color:transparent;color:none")
 
         self.maximize_button = self.create_button("assets/maximize_button.svg")

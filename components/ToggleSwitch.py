@@ -5,16 +5,6 @@ from PySide6.QtGui import QColor, QPainter, QBrush
 
 class ToggleSwitch(QPushButton):
     def __init__(self, parent=None, width=60, height=30, on_color="#4CAF50", off_color="#CCCCCC", circle_color="#FFFFFF"):
-        """
-        Reusable ToggleSwitch widget.
-
-        :param parent: Parent widget.
-        :param width: Width of the toggle switch.
-        :param height: Height of the toggle switch.
-        :param on_color: Background color when toggled on.
-        :param off_color: Background color when toggled off.
-        :param circle_color: Color of the toggle button.
-        """
         super().__init__(parent)
         self.setCheckable(True)
         self.setChecked(False)

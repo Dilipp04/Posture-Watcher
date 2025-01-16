@@ -1,14 +1,38 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QDialog
+from PySide6.QtWidgets import QApplication, QFrame, QVBoxLayout, QPushButton, QWidget
 from PySide6.QtCore import QPropertyAnimation, QRect, Qt
 from PySide6.QtGui import QPainter, QPixmap
 
-class ImageDialog(QDialog):
-    def __init__(self, image_path):
-        super().__init__()
+
+class AnimatedImageWidget(QWidget):
+    def __init__(self, image_path, parent=None):
+        super().__init__(parent)
         self.image_path = image_path
         self.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground, True)
         self.resize(200, 200)
+
+        # Animation-related attributes
+        self.animation = QPropertyAnimation(self, b"geometry")
+
+    def configure_positions(self, screen_geometry, offset=250):
+        """Configure the start and end positions for animation."""
+        self.start_x = (screen_geometry.width() - self.width()) // 2
+        self.start_y = screen_geometry.height()
+        self.end_y = screen_geometry.height() - offset
+
+        self.start_geometry = QRect(self.start_x, self.start_y, 200, 200)
+        self.end_geometry = QRect(self.start_x, self.end_y, 200, 200)
+
+        # Initialize the widget's position
+        self.setGeometry(self.start_geometry)
+
+    def toggle_animation(self, move_up):
+        """Animate the widget based on the posture state."""
+        target_geometry = self.end_geometry if move_up else self.start_geometry
+        self.animation.setDuration(1000)  # 1 second
+        self.animation.setStartValue(self.geometry())
+        self.animation.setEndValue(target_geometry)
+        self.animation.start()
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -19,58 +43,40 @@ class ImageDialog(QDialog):
         target_rect = self.rect()
         painter.drawPixmap(target_rect, pixmap)
 
-class MainWindow(QMainWindow):
+
+class MainFrame(QFrame):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Posture Monitoring")
-        self.resize(400, 300)
+        self.setWindowTitle("Posture Monitoring - Home Page")
+        self.resize(600, 400)
 
-        self.button = QPushButton("Simulate Posture State", self)
+        # Set up layout
+        self.layout = QVBoxLayout(self)
+        self.setLayout(self.layout)
+
+        # Add a button to toggle posture animation
+        self.button = QPushButton("Toggle Posture Animation", self)
         self.button.clicked.connect(self.toggle_posture_state)
-        self.setCentralWidget(self.button)
+        self.layout.addWidget(self.button)
 
         self.bad_posture = False  # Simulated posture state
-        self.image_dialog = None
-        self.init_image_dialog()
 
-    def init_image_dialog(self):
-        image_path = "assets/memoji.png"  # Replace with your image file path
-        self.image_dialog = ImageDialog(image_path)
-
-        # Start position (off-screen at the bottom)
+        # Create and configure the reusable component
+        self.image_widget = AnimatedImageWidget("assets/memoji.png", self)
         screen_geometry = QApplication.primaryScreen().geometry()
-
-        # for changing the position of the image dialog
-        self.start_x = (screen_geometry.width() - self.image_dialog.width()) // 1
-        self.start_y = screen_geometry.height()
-        self.end_y = screen_geometry.height() - 250
-
-        self.image_dialog.setGeometry(self.start_x, self.start_y, 200, 200)
-        self.image_dialog.show()
+        self.image_widget.configure_positions(screen_geometry)
+        self.image_widget.show()
 
     def toggle_posture_state(self):
         self.bad_posture = not self.bad_posture
-        self.animate_posture_response(self.bad_posture)
+        self.image_widget.toggle_animation(self.bad_posture)
 
-    def animate_posture_response(self, is_bad_posture):
-        if is_bad_posture:
-            # Animate upward when posture is bad
-            target_geometry = QRect(self.start_x, self.end_y, 200, 200)
-        else:
-            # Animate back to the bottom when posture is good
-            target_geometry = QRect(self.start_x, self.start_y, 200, 200)
-
-        self.animation = QPropertyAnimation(self.image_dialog, b"geometry")
-        self.animation.setDuration(1000)  # 1 second
-        self.animation.setStartValue(self.image_dialog.geometry())
-        self.animation.setEndValue(target_geometry)
-        self.animation.start()
 
 if __name__ == "__main__":
     app = QApplication([])
 
-    # Simulated main window
-    window = MainWindow()
-    window.show()
+    # Example usage
+    frame = MainFrame()
+    frame.show()
 
     app.exec()
