@@ -43,9 +43,6 @@ class Home(QFrame):
         
         self.init_ui()
 
-    def toggle_posture_state(self):
-        self.image_widget.toggle_animation(self.bad_posture)
-
     def init_posture_analyzer(self):
         camera_angle = self.state.get_setting("camera_angle")
         if camera_angle == "Front":
@@ -63,7 +60,7 @@ class Home(QFrame):
         # Video display
         self.video_label = QLabel(self)
         self.video_label.setFixedSize(720, 480)
-        self.video_label.setStyleSheet(f"background-color: #f0f0f0; border: 5px solid black;")
+        self.video_label.setStyleSheet(f"background-color: #f0f0f0; color: Gray;border: 5px solid black;font-size:20px;font-weight:bold")
         self.video_label.setAlignment(Qt.AlignCenter)
 
         # Timer label to display elapsed time
@@ -138,7 +135,7 @@ class Home(QFrame):
             self.elapsed_time_timer.start(1000)
             self.timer.start(30)  # 30ms for ~33 FPS
         except Exception as e:
-            self.video_label.setText(str(e))
+            self.video_label.setText("Please face toward's Camera")
 
     def stop_monitoring(self):
         self.timer.stop()
@@ -199,7 +196,7 @@ class Home(QFrame):
 
     def save_history(self):
         """Save session data to history.csv."""
-        file_path = "history.csv"
+        file_path = "storage/history.csv"
         current_date = datetime.now().strftime("%d %b %Y")
         total_minutes = self.elapsed_time / 60  # Convert seconds to minutes
 

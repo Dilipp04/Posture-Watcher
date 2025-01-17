@@ -15,7 +15,7 @@ class Dashboard(QWidget):
         self.text_color = "#013e54"
         self.setWindowTitle("Dashboard")
         self.setStyleSheet(f"background-color:white;color:{self.text_color};")
-        self.data_file = "history.csv"
+        self.data_file = "storage/history.csv"
         self.data = self.load_data()
         self.setup_ui()
 
