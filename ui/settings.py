@@ -41,7 +41,7 @@ class Settings(QWidget):
         self.add_section(
             "Position",
             "",
-            self.create_toggle_buttons(["Left", "Middle", "Right"],"position")
+            self.create_toggle_buttons(["Left", "Center", "Right"],"position")
         )
         self.add_section(
             "Play Sound",

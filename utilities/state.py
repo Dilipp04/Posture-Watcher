@@ -2,13 +2,14 @@ from PySide6.QtCore import Signal, QObject
 
 class State(QObject):
     camera_angle_changed = Signal()
+    setting_changed = Signal()
     def __init__(self):
         super().__init__()
         self.settings = {
             "camera": 0,                 # Default camera index
             "camera_angle": "Front",      # Possible values: 'front', 'side'
             "delay": 3,                 # Delay in milliseconds (e.g., for timer)
-            "position": "center",        # Default position (e.g., 'center', 'left', 'right')
+            "position": "Right",        # Default position (e.g., 'center', 'left', 'right')
             "play_sound": True           # Whether to play sound notifications
         }
 
@@ -18,6 +19,8 @@ class State(QObject):
             self.settings[key] = value
             if key == "camera_angle" or key == "camera":
                 self.camera_angle_changed.emit()
+            else:
+                self.setting_changed.emit()
         else:
             raise KeyError(f"Setting '{key}' does not exist.")
 

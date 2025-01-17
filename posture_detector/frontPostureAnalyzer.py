@@ -15,7 +15,7 @@ class FrontPostureAnalyzer:
     def __init__(self,base_posture=None):
         
         self.detector = PoseDetector()
-        self.threshold = 30
+        self.threshold = 40
         self.deviation_adjustment =5
         self.fps = 30  # Default FPS
         self.cap = cv2.VideoCapture(0)
@@ -90,7 +90,7 @@ class FrontPostureAnalyzer:
         _, lm = self.detector.find_pose(img)
         deviation = 100
 
-        if not lm:  # No pose found
+        if lm is None:  # No pose found
             return deviation
 
         # Nose and mouth are used for both algorithms so its out here.

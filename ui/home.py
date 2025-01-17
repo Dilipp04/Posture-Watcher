@@ -1,23 +1,26 @@
 import csv
 from datetime import datetime
 from PySide6.QtWidgets import (
-    QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QFrame, QApplication, QGraphicsDropShadowEffect
+    QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QFrame, QApplication
 )
 import sys
+import winsound
 from os import path , system
 from PySide6.QtCore import QTimer, Qt, QSize
 from PySide6.QtGui import QPixmap, QImage, QFont, QIcon
 from posture_detector.sidePostureAnalyzer import SidePostureAnalyzer
 from posture_detector.frontPostureAnalyzer import FrontPostureAnalyzer
 from utilities.state import State
+from components.character_animation import AnimatedImageWidget
 
 
 class Home(QFrame):
-    def __init__(self, state: State):
+    def __init__(self, state: State,mainWindow=None):
         super().__init__()
 
         self.state = state
         self.state.camera_angle_changed.connect(self.handle_state_change)
+        self.state.setting_changed.connect(self.update_ui)
         self.init_posture_analyzer()
 
         self.timer = QTimer()
@@ -27,8 +30,21 @@ class Home(QFrame):
         self.elapsed_time_timer.timeout.connect(self.update_elapsed_time)
         self.elapsed_time = 0  # Initialize elapsed time
         self.good_posture_minutes = 0  # Track good posture minutes
+        
+        self.bad_posture = False  # Simulated posture state
+        self.bad_posture_timer = 0  # Counter for bad posture duration
+        self.threshold_seconds = int(self.state.get_setting("delay") )
 
+        # Create and configure the Characrter Animation component
+        self.image_widget = AnimatedImageWidget("assets/memoji.png",mainWindow)
+        self.screen_geometry = QApplication.primaryScreen().geometry()
+        self.image_widget.configure_positions(self.screen_geometry,self.state.get_setting("position"))
+        self.image_widget.show()
+        
         self.init_ui()
+
+    def toggle_posture_state(self):
+        self.image_widget.toggle_animation(self.bad_posture)
 
     def init_posture_analyzer(self):
         camera_angle = self.state.get_setting("camera_angle")
@@ -112,6 +128,9 @@ class Home(QFrame):
         else:
             self.set_base_button.setHidden(False)
 
+        self.image_widget.configure_positions(self.screen_geometry,self.state.get_setting("position"))
+        self.threshold_seconds =int( self.state.get_setting("delay") )
+
     def start_monitoring(self):
         try:
             self.video_label.setText("Loading")
@@ -145,6 +164,7 @@ class Home(QFrame):
             self.video_label.setStyleSheet("border: 5px solid Green;")
             self.good_posture_minutes += (1 / (30 * 60))# Increment good posture minutes
         else:
+            self.bad_posture = True
             self.status_label.setText("Posture Status: Bad ❌")
             self.video_label.setStyleSheet("border: 5px solid red;")
 
@@ -156,10 +176,26 @@ class Home(QFrame):
         else:
             self.video_label.setText("No frame available.")
 
+    def update_posture_state(self):
+        """Updates posture state and triggers animation with buffer logic."""
+        if self.bad_posture:
+            self.bad_posture_timer += 1  # Increment bad posture duration
+            if self.bad_posture_timer >= self.threshold_seconds:
+                self.image_widget.toggle_animation(True)  # Trigger animation
+        else:
+            if self.bad_posture_timer > 0:
+                self.image_widget.toggle_animation(False)  # Reset animation
+            
+            self.bad_posture_timer = 0  # Reset counter if posture is good
+
+        # Simulate bad posture resetting for testing
+        self.bad_posture = False
+
     def update_elapsed_time(self):
         self.elapsed_time += 1
         minutes, seconds = divmod(self.elapsed_time, 60)
         self.timer_label.setText(f"{minutes:02}:{seconds:02}")
+        self.update_posture_state()
 
     def save_history(self):
         """Save session data to history.csv."""

@@ -35,7 +35,7 @@ class PostureWatcherUI(QWidget):
         # Global state for whole application
         state = State()
         # Create tabs
-        self.home = Home(state)
+        self.home = Home(state,self)
         self.dashboard_tab = Dashboard()
         self.settings_tab = Settings(state)
 
