@@ -1,6 +1,5 @@
 import cv2
 from posture_detector.detector import PoseDetector, PoseLandmarks
-from posture_detector.deviation import Deviation
 
 class BasePosture:
     def __init__(self, nose: float, mouth_right: float, mouth_left: float, left_shoulder: float, right_shoulder: float):
@@ -63,19 +62,21 @@ class FrontPostureAnalyzer:
         keypoints = self.detector.pose.process(image_rgb)
         image_bgr = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
 
-        posture_data = {"status": "Unknown", "deviation": None}
+        posture_data = {"status": "Unknown", "deviation": None, "alert":"Unknown"}
 
         if keypoints.pose_landmarks:
             cd = self._get_deviation_from_base_posture()
-
+            posture_data["deviation"] = cd
             if  cd < self.threshold:
                 posture_data["status"] = "Good"
+                posture_data["alert"] = "Perfect posture! Keep it up! 😊"
             else:
                 posture_data["status"] = "Bad"
+                posture_data["alert"] = "Bad posture detected! Adjust your sitting position. ⚠️"
 
         return image_bgr, posture_data
 
-    def _get_deviation_from_base_posture(self, algorithm_version: int = 1):
+    def _get_deviation_from_base_posture(self, algorithm_version: int = 2):
         """
         Calculates the deviation from the base posture as a percentage
         :param algorithm_version: The algorithm version to use (int).

@@ -53,7 +53,7 @@ class StartUpAnimationWindow(QMainWindow):
     def show_main_window(self):
         # Transition to the main window once the GIF finishes
         self.main_window = PostureWatcherUI()
-        self.main_window.showMaximized()
+        self.main_window.show()
         self.close()  # Close the startup animation window
 
 if __name__ == "__main__":

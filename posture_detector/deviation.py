@@ -1,7 +1,7 @@
 import time
 
 class Deviation:
-    def __init__(self, threshold=40, max_buffer=0):
+    def __init__(self, threshold=40, max_buffer=20):
         self._threshold = threshold
         self._max_buffer = max_buffer
         self._current_buffer = 0

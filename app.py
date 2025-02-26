@@ -3,7 +3,7 @@ from ui.home import Home
 from ui.settings import Settings
 from ui.dashboard import Dashboard
 from ui.mainWindow import PostureWatcherUI
-from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QApplication
 
 def main():
 

@@ -157,14 +157,13 @@ class Home(QFrame):
     def update_frame(self):
         frame, posture_data = self.posture_analyzer.process_frame()     
         if posture_data["status"] == "Good":
-            self.status_label.setText("Posture Status: Good ✅")
             self.video_label.setStyleSheet("border: 5px solid Green;")
             self.good_posture_minutes += (1 / (30 * 60))# Increment good posture minutes
         else:
             self.bad_posture = True
-            self.status_label.setText("Posture Status: Bad ❌")
             self.video_label.setStyleSheet("border: 5px solid red;")
 
+        self.status_label.setText(posture_data["alert"])
         if frame is not None:
             height, width, channel = frame.shape
             bytes_per_line = channel * width

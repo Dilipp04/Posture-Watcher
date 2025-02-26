@@ -4,8 +4,6 @@ import mediapipe as mp
 
 class SidePostureAnalyzer:
     def __init__(self):
-        self.good_frames = 0
-        self.bad_frames = 0
         self.fps = 30  # Default FPS
         self.mp_pose = mp.solutions.pose
         self.pose = self.mp_pose.Pose()
@@ -33,7 +31,7 @@ class SidePostureAnalyzer:
         keypoints = self.pose.process(image_rgb)
         image_bgr = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
 
-        posture_data = {"status": "Unknown", "neck_inclination": None, "torso_inclination": None}
+        posture_data = {"status": "Unknown", "neck_inclination": None, "torso_inclination": None,"alert":"Unknown"}
         if keypoints.pose_landmarks:
             lm = keypoints.pose_landmarks
             lmPose = self.mp_pose.PoseLandmark
@@ -64,13 +62,21 @@ class SidePostureAnalyzer:
 
             # Determine posture
             if neck_inclination < 40 and torso_inclination < 10:
-                self.bad_frames = 0
-                self.good_frames += 1
                 posture_data["status"] = "Good"
-            else:
-                self.good_frames = 0
-                self.bad_frames += 1
+                posture_data["alert"] = "Perfect posture! Keep it up! 😊"
+
+            elif neck_inclination > 40 and torso_inclination < 10:
                 posture_data["status"] = "Bad"
+                posture_data["alert"] = "Your neck is tilted forward. Try keeping it straight."
+
+            elif torso_inclination > 10 and neck_inclination < 40:
+                posture_data["status"] = "Bad"
+                posture_data["alert"] = "Straighten your back to improve posture."
+
+            elif neck_inclination > 40 and torso_inclination > 10:
+                posture_data["status"] = "Bad"
+                posture_data["alert"] = "Bad posture detected! Keep your back straight and head up."
+
         return image_bgr, posture_data
 
 
