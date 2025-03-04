@@ -54,7 +54,7 @@ class Home(QFrame):
         # Title
         title = QLabel("Posture Analyzer")
         title.setFont(QFont("Arial", 20, QFont.Bold))
-        title.setStyleSheet("margin:10px 10px; padding: 10px;")
+        title.setStyleSheet("margin:10px 10px; padding: 10px;color:#013e54;")
         title.setAlignment(Qt.AlignLeft)
 
         # Video display

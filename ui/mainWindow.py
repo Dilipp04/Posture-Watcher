@@ -18,7 +18,7 @@ class PostureWatcherUI(QWidget):
     def init_ui(self):
         super().__init__()
         self.setWindowTitle("Posture Watcher")
-        self.setMinimumSize(1000, 720)
+        self.setMinimumSize(1200, 720)
         self.setWindowIcon(QIcon("assets/window-icon.png"))
 
         main_layout = QHBoxLayout(self)
@@ -108,19 +108,23 @@ class PostureWatcherUI(QWidget):
 
         sidebar_layout.addStretch()
 
-        image_button = QPushButton(self)
-        image_button.setText("Minimize")
-        image_button.setIcon(QIcon("assets/minimize_icon.svg"))  # Path to your image
-        image_button.setIconSize(QPixmap(icon_path).scaled(20, 20, Qt.KeepAspectRatio).size())
-        image_button.setStyleSheet(inactive_style) 
-        image_button.clicked.connect(self.showMinimized)
-        sidebar_layout.addWidget(image_button)
+        self.image_button = QPushButton(self)
+        self.image_button.setText("Minimize")
+        self.image_button.setIcon(QIcon("assets/minimize_icon.svg"))  # Path to your image
+        self.image_button.setIconSize(QPixmap(icon_path).scaled(20, 20, Qt.KeepAspectRatio).size())
+        self.image_button.setStyleSheet(inactive_style) 
+        self.image_button.clicked.connect(self.showMinimized)
+        sidebar_layout.addWidget(self.image_button)
 
         return sidebar
 
     def switch_tab(self, index, active_style, inactive_style):
         # Switch the current tab
         self.content_area.setCurrentIndex(index)
+        if self.content_area.currentIndex() == 0:
+            self.image_button.show()
+        else:
+            self.image_button.hide()
 
         # Update styles for all buttons
         for text, button in self.nav_button_dict.items():
