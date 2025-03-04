@@ -146,15 +146,11 @@ class Yoga(QMainWindow):
         self.pose_dropdown.setMinimumSize(200, 40)
         self.pose_dropdown.currentTextChanged.connect(self.update_pose)
         right_layout.addWidget(self.pose_dropdown, alignment=Qt.AlignTop | Qt.AlignHCenter)
-
-        right_layout.addSpacerItem(QSpacerItem(20, 30, QSizePolicy.Minimum, QSizePolicy.Fixed))
         
         self.pose_image = QLabel()
         self.pose_image.setMinimumSize(300, 300)
         self.pose_image.setStyleSheet("border: 3px solid gray; border-radius: 10px; padding:2px")
         right_layout.addWidget(self.pose_image, alignment=Qt.AlignCenter)
-
-        right_layout.addSpacerItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed))
         
         self.pose_name = QLabel("Tadasana")
         self.pose_name.setAlignment(Qt.AlignCenter)
@@ -162,7 +158,6 @@ class Yoga(QMainWindow):
         right_layout.addWidget(self.pose_name, alignment=Qt.AlignCenter)
 
         right_layout.addSpacerItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed))
-
 
         # Add frames to content layout
         content_layout.addWidget(left_frame)
@@ -175,8 +170,14 @@ class Yoga(QMainWindow):
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_frame)
         
-        self.elapsed_timer = QElapsedTimer()
-        self.timer_running = False
+        self.elapsed_time = 0  # Store elapsed seconds
+        self.timer_running = False  # Track if timer is active
+        
+        # Create a QTimer that triggers every second
+        self.elapsed_timer = QTimer()
+        self.elapsed_timer.timeout.connect(self.update_timer)  # Connect to update function
+        self.elapsed_timer.setInterval(1000)  # Set 1-second interval
+
         # Set default image
         self.update_pose("tadasana")
     
@@ -250,16 +251,19 @@ class Yoga(QMainWindow):
             else:
                 status_text = "Pose Incorrect or Not Trained"
                 color = (0, 0, 255)
-                self.timer_running = False
+
+                if self.timer_running:
+                    self.elapsed_timer.stop()
+                    self.timer_running = False
             
             self.status_label.setText(f"{status_text}")
         else:
             self.status_label.setText("Ensure Full Body is Visible")
-            self.timer_running = False
+            if self.timer_running:
+                    self.elapsed_timer.stop()
+                    self.timer_running = False
         
-        if self.timer_running:
-            elapsed_time = self.elapsed_timer.elapsed() // 1000
-            self.timer_label.setText(f"{elapsed_time}s")
+        self.timer_label.setText(f"{self.elapsed_time}s")
         
 
 
@@ -274,6 +278,11 @@ class Yoga(QMainWindow):
         pixmap = QPixmap.fromImage(qimg)
         scaled_pixmap = pixmap.scaled(self.camera_label.size(), Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
         self.camera_label.setPixmap(scaled_pixmap)
+
+    def update_timer(self):
+        """Increment the timer every second."""
+        self.elapsed_time += 1
+        self.timer_label.setText(f"{self.elapsed_time}s")
 
 if __name__ == '__main__':
     app = QApplication([])

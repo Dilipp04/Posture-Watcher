@@ -55,39 +55,18 @@ python src/main.py
 3. The posture status will be displayed on the screen.
 4. If your posture is good, it will show "Posture Status: Good ✅".
 5. If your posture is bad, it will show "Posture Status: Bad ❌".
-
-## File Structure
-
-```
-PostureWatcher/
-├── assets/                 # Contains images, GIFs, and other assets
-├── src/                    # Source code
-│   ├── main.py             # Main script to run the application
-│   ├── ui/                 # UI components
-│   │   ├── dashboard.py    # Dashboard UI
-│   │   ├── mainWindow.py   # Main window UI
-│   └── components/         # Additional components
-│       ├── postureAnalyzer.py  # Posture analysis logic
-│       ├── sidePostureDetection.py  # Side posture detection logic
-├── requirements.txt        # List of dependencies
-├── README.md               # This file
-└── venv/                   # Virtual environment (not included in the repository)
-```
+6. For Yoga Detection:
+   Select a yoga pose from the dropdown.
+   The application will compare your posture to the selected yoga pose.
+   If the detected pose matches with confidence > 80%, it will confirm the correct pose.
 
 ## Dependencies
 
 - PySide6
 - OpenCV
 - Mediapipe
-
-## Contributing
-
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature-branch`).
-3. Make your changes.
-4. Commit your changes (`git commit -m 'Add some feature'`).
-5. Push to the branch (`git push origin feature-branch`).
-6. Open a pull request.
+- Tensorflow
+- Keras
 
 ## Acknowledgements
 
