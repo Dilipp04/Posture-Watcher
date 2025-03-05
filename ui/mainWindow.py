@@ -43,8 +43,8 @@ class PostureWatcherUI(QWidget):
 
         # Add tabs to stacked widget
         self.content_area.addWidget(self.home)
-        self.content_area.addWidget(self.dashboard_tab)
         self.content_area.addWidget(self.yoga_tab)
+        self.content_area.addWidget(self.dashboard_tab)
         self.content_area.addWidget(self.settings_tab)
     
     def sidebar(self):
@@ -63,8 +63,8 @@ class PostureWatcherUI(QWidget):
         # Navigation buttons
         nav_buttons = [
             ("Home", "assets/home_icon.svg"),
-            ("Dashboard", "assets/dashboard_icon.svg"),
             ("Yoga","assets/yoga_icon.svg"),
+            ("Dashboard", "assets/dashboard_icon.svg"),
             ("Settings", "assets/settings_icon.svg")
         ]
         self.nav_button_dict = {}

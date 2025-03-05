@@ -4,7 +4,6 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
-from components.ToggleSwitch import ToggleSwitch
 from utilities.state import State
 
 class Settings(QWidget):
@@ -42,11 +41,6 @@ class Settings(QWidget):
             "Position",
             "",
             self.create_toggle_buttons(["Left", "Center", "Right"],"position")
-        )
-        self.add_section(
-            "Play Sound",
-            "",
-            self.create_toggle_switch("play_sound")
         )
         self.add_section(
             "Delay",
@@ -188,24 +182,6 @@ class Settings(QWidget):
             self.state.update_setting(state_key, options[0])
 
         return container
-
-    def create_toggle_switch(self, state_key):
-        """Create a toggle switch with a rounded button."""
-        button_container = QWidget()
-        button_container.setFixedSize(230, 40)
-        button_container.setStyleSheet(" border-radius: 10px; padding: 5px;")
-        button_layout = QHBoxLayout(button_container)
-        button_layout.setSpacing(5)
-        button_layout.setContentsMargins(0, 0, 0, 0)
-
-        toggle_button = ToggleSwitch(self, width=55, height=30, on_color="#013e54", off_color="lightgray")
-        toggle_button.setChecked(self.state.get_setting(state_key))
-        toggle_button.toggled.connect(
-            lambda checked: self.state.update_setting(state_key, checked)
-        )
-        button_layout.addWidget(toggle_button)
-
-        return button_container
 
 
 def main():

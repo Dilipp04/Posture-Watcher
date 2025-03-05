@@ -99,7 +99,7 @@ class Dashboard(QWidget):
         title_label.setFont(QFont("Arial", 12, QFont.Bold))
         title_label.setAlignment(Qt.AlignLeft)
 
-        value_label = QLabel(f"{value}")
+        value_label = QLabel(f"{value}%")
         value_label.setFont(QFont("Arial", 25, QFont.Bold))
         value_label.setAlignment(Qt.AlignLeft)
 

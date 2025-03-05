@@ -10,7 +10,6 @@ class State(QObject):
             "camera_angle": "Front",      # Possible values: 'front', 'side'
             "delay": 3,                 # Delay in milliseconds (e.g., for timer)
             "position": "Right",        # Default position (e.g., 'center', 'left', 'right')
-            "play_sound": True           # Whether to play sound notifications
         }
 
     # Methods to update or retrieve settings

@@ -217,6 +217,7 @@ class Yoga(QMainWindow):
         self.timer.stop()
         self.camera_label.clear()
         self.timer_running = False
+        self.elapsed_time = 0
         self.timer_label.setText("00:00")
     
     def update_frame(self):

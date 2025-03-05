@@ -11,7 +11,7 @@ from PySide6.QtGui import QPixmap, QImage, QFont, QIcon
 from posture_detector.sidePostureAnalyzer import SidePostureAnalyzer
 from posture_detector.frontPostureAnalyzer import FrontPostureAnalyzer
 from utilities.state import State
-from components.character_animation import AnimatedImageWidget
+from ui.character_animation import AnimatedImageWidget
 
 
 class Home(QFrame):
