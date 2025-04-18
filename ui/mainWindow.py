@@ -1,7 +1,7 @@
 import sys
-from PySide6.QtWidgets import QWidget, QVBoxLayout,QStackedWidget, QLabel, QProgressBar, QFrame, QHBoxLayout , QApplication ,QPushButton
-from PySide6.QtCore import Qt , QSize
-from PySide6.QtGui import QFont ,QPixmap , QIcon
+from PySide6.QtWidgets import QWidget, QVBoxLayout,QStackedWidget, QLabel, QFrame, QHBoxLayout ,QPushButton
+from PySide6.QtCore import Qt 
+from PySide6.QtGui import QPixmap , QIcon
 from ui.dashboard import Dashboard
 from ui.settings import Settings
 from ui.home import Home

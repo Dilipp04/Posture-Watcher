@@ -204,11 +204,6 @@ class Yoga(QMainWindow):
         # Set default image
         self.update_pose("tadasana")
 
-    def update_accuracy(self, accuracy):
-        self.accuracy_anim.stop()
-        self.accuracy_anim.setStartValue(self.accuracy_progress_bar.value())
-        self.accuracy_anim.setEndValue(accuracy)
-        self.accuracy_anim.start()
     
     def update_pose(self, pose):
         self.pose_name.setText(f"{pose}".title())
@@ -319,3 +314,31 @@ class Yoga(QMainWindow):
         """Increment the timer every second."""
         self.elapsed_time += 1
         self.timer_label.setText(f"{self.elapsed_time}s")
+    
+    def update_accuracy(self, accuracy):
+        if accuracy >= 80:
+            self.set_progress_bar_color("#4CAF50")  # Green
+        elif accuracy >= 60:
+            self.set_progress_bar_color("#FFA500")  # Orange
+        else:
+            self.set_progress_bar_color("#F44336")  # Red
+
+        self.accuracy_anim.stop()
+        self.accuracy_anim.setStartValue(self.accuracy_progress_bar.value())
+        self.accuracy_anim.setEndValue(accuracy)
+        self.accuracy_anim.start()
+
+    def set_progress_bar_color(self, color: str):
+        self.accuracy_progress_bar.setStyleSheet(f"""
+            QProgressBar {{
+                border: 2px solid #ccc;
+                border-radius: 10px;
+                text-align: center;
+                height: 30px;
+                width: 300px;
+            }}
+            QProgressBar::chunk {{
+                background-color: {color};
+                border-radius: 10px;
+            }}
+        """)
