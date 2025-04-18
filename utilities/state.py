@@ -12,7 +12,6 @@ class State(QObject):
             "position": "Right",        # Default position (e.g., 'center', 'left', 'right')
         }
 
-    # Methods to update or retrieve settings
     def update_setting(self, key, value):
         if key in self.settings:
             self.settings[key] = value

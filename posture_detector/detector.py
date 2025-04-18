@@ -9,9 +9,6 @@ class PoseLandmarks:
     RIGHT_SHOULDER = 12
 
 class PoseDetector:
-    """
-    PoseDetector is a wrapper for the Mediapipe Pose component.
-    """
     def __init__(self):
         self.results = None
         self.mpDraw = mp.solutions.drawing_utils
@@ -20,17 +17,8 @@ class PoseDetector:
         self.pose_connections = self.mpPose.POSE_CONNECTIONS  # Get the pose connections
 
     def find_pose(self, img, draw=True):
-        """
-        Finds a pose in a given image and draws landmarks onto it.
-        
-        :img cv2.VideoCapture: The source image to look for pose landmarks in
-        :draw boolean: Whether to draw landmarks on the image
-        :returns: If landmarks are found, (img, landmarks). Otherwise, if no landmarks are found, 
-                  (img, landmarks) is returned.
-        """
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB
         self.results = self.pose.process(img_rgb)
-
 
         if not self.results.pose_landmarks:
             return

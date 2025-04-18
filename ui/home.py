@@ -226,13 +226,3 @@ class Home(QFrame):
         with open(file_path, mode="w", newline="") as file:
             writer = csv.writer(file)
             writer.writerows(data)
-
-def main():
-    app = QApplication(sys.argv)
-    state = State()  # Initialize state object
-    mainWin = Home(state)
-    mainWin.show()
-    sys.exit(app.exec())
-
-if __name__ == '__main__':
-    main()

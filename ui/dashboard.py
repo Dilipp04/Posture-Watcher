@@ -77,8 +77,8 @@ class Dashboard(QWidget):
         bottom_layout = QHBoxLayout()
         bottom_layout.setSpacing(15)
 
-        bottom_layout.addWidget(self.create_progress_card("Progress this Week",self.data, self.bg_color))
-        bottom_layout.addWidget(self.create_progress_card("Usage this Week",self.data, self.bg_color))
+        bottom_layout.addWidget(self.create_progress_card("Progress this Week",self.data, self.bg_color,"progress"))
+        bottom_layout.addWidget(self.create_progress_card("Usage this Week",self.data, self.bg_color, "usage"))
 
         main_layout.addLayout(bottom_layout)
 
@@ -186,7 +186,7 @@ class Dashboard(QWidget):
 
         return canvas
 
-    def create_progress_card(self, title, weekly_data, bg_color):
+    def create_progress_card(self, title, weekly_data, bg_color, type):
         card = QFrame()
         card.setFrameShape(QFrame.StyledPanel)
         card.setStyleSheet(f"background-color: {bg_color}; border-radius: 10px; ")
@@ -197,8 +197,9 @@ class Dashboard(QWidget):
         title_label = QLabel(title)
         title_label.setFont(QFont("Arial", 12, QFont.Bold))
         title_label.setAlignment(Qt.AlignLeft)
-
         progress_layout = QVBoxLayout()
+        max_entry = max(weekly_data, key=lambda x: x['total_minutes'])
+
         for day_data in weekly_data:
             day_layout = QHBoxLayout()
 
@@ -206,9 +207,15 @@ class Dashboard(QWidget):
             day_label.setFont(QFont("Arial", 10))
             day_label.setAlignment(Qt.AlignLeft)
 
-            percentage = self.get_percentage(day_data["good_posture_minutes"], day_data["total_minutes"])
+            if type == "progress":
+                percentage = self.get_percentage(day_data["good_posture_minutes"], day_data["total_minutes"])
+                percent_label = QLabel(f"{percentage}%")  # Use data value
+            else:
+                percentage = self.get_percentage(day_data["total_minutes"],max_entry["total_minutes"])
+                percent_label = QLabel(f"{day_data["total_minutes"]} min")  # Use data value
+                
 
-            percent_label = QLabel(f"{percentage}%")  # Use data value
+
             percent_label.setFont(QFont("Arial", 10))
             percent_label.setAlignment(Qt.AlignLeft)
 
@@ -259,14 +266,3 @@ class Dashboard(QWidget):
     def get_percentage(good_posture_minutes, total_minutes):
         result =  ( good_posture_minutes/ total_minutes * 100) if total_minutes > 0 else 0
         return round(result,1)
-
-def main():
-    import sys
-    app = QApplication(sys.argv)
-    dashboard = Dashboard()
-    dashboard.show()
-    sys.exit(app.exec())
-
-
-if __name__ == "_main_":
-    main()

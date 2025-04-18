@@ -5,10 +5,10 @@ import mediapipe as mp
 from keras.models import load_model
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QComboBox, 
-    QPushButton, QFrame, QSpacerItem, QSizePolicy
+    QPushButton, QFrame, QSpacerItem, QSizePolicy ,QProgressBar
 )
-from PySide6.QtCore import Qt,QTimer ,QElapsedTimer
-from PySide6.QtGui import QFont, QPixmap,QImage
+from PySide6.QtCore import Qt,QTimer ,QElapsedTimer ,QPropertyAnimation
+from PySide6.QtGui import QFont, QPixmap,QImage 
 from utilities.state import State
 
 class Yoga(QMainWindow):
@@ -159,6 +159,29 @@ class Yoga(QMainWindow):
 
         right_layout.addSpacerItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed))
 
+        self.accuracy_progress_bar = QProgressBar()
+        self.accuracy_progress_bar.setAlignment(Qt.AlignCenter)
+        self.accuracy_progress_bar.setFormat("%p%")
+        self.accuracy_progress_bar.setValue(0)
+        self.accuracy_progress_bar.setStyleSheet("""
+            QProgressBar {
+                border: 2px solid #ccc;
+                border-radius: 10px;
+                text-align: center;
+                height: 30px;
+                width:300px;
+            }
+            QProgressBar::chunk {
+                background-color: #4CAF50;
+                border-radius: 10px;
+            }
+        """)
+
+        self.accuracy_anim = QPropertyAnimation(self.accuracy_progress_bar, b"value")
+        self.accuracy_anim.setDuration(10)
+        right_layout.addWidget(self.accuracy_progress_bar, alignment=Qt.AlignCenter)
+
+
         # Add frames to content layout
         content_layout.addWidget(left_frame)
         content_layout.addWidget(right_frame)
@@ -180,6 +203,12 @@ class Yoga(QMainWindow):
 
         # Set default image
         self.update_pose("tadasana")
+
+    def update_accuracy(self, accuracy):
+        self.accuracy_anim.stop()
+        self.accuracy_anim.setStartValue(self.accuracy_progress_bar.value())
+        self.accuracy_anim.setEndValue(accuracy)
+        self.accuracy_anim.start()
     
     def update_pose(self, pose):
         self.pose_name.setText(f"{pose}".title())
@@ -242,7 +271,8 @@ class Yoga(QMainWindow):
             pred = self.label_names[np.argmax(p)]
             accuracy = p[0][np.argmax(p)] * 100
             
-            
+            self.update_accuracy(int(accuracy))
+
             if pred == self.pose_dropdown.currentText() and accuracy > 80:
                 status_text = f"Pose: {pred} {accuracy:.2f}%"
                 color = (0, 255, 0)
@@ -253,6 +283,10 @@ class Yoga(QMainWindow):
                 status_text = "Pose Incorrect or Not Trained"
                 color = (0, 0, 255)
 
+                if pred != self.pose_dropdown.currentText() and accuracy > 70:
+                    self.update_accuracy(0)
+
+
                 if self.timer_running:
                     self.elapsed_timer.stop()
                     self.timer_running = False
@@ -260,6 +294,7 @@ class Yoga(QMainWindow):
             self.status_label.setText(f"{status_text}")
         else:
             self.status_label.setText("Ensure Full Body is Visible")
+            self.update_accuracy(0)
             if self.timer_running:
                     self.elapsed_timer.stop()
                     self.timer_running = False
@@ -284,10 +319,3 @@ class Yoga(QMainWindow):
         """Increment the timer every second."""
         self.elapsed_time += 1
         self.timer_label.setText(f"{self.elapsed_time}s")
-
-if __name__ == '__main__':
-    app = QApplication([])
-    state = State()
-    window = Yoga(state)
-    window.showMaximized()
-    app.exec()

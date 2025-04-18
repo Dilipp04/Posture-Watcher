@@ -12,7 +12,6 @@ from ui.miniWindow import MiniWindow
 
 class PostureWatcherUI(QWidget):
     def __init__(self):
-        # Setup UI components
         self.init_ui()
 
     def init_ui(self):
@@ -33,7 +32,6 @@ class PostureWatcherUI(QWidget):
         self.content_area.setStyleSheet("background-color: white;border-radius: 10px;")
         main_layout.addWidget(self.content_area, 10)
 
-        # Global state for whole application
         state = State()
         # Create tabs
         self.home = Home(state,self)
@@ -41,26 +39,22 @@ class PostureWatcherUI(QWidget):
         self.yoga_tab = Yoga(state)
         self.settings_tab = Settings(state)
 
-        # Add tabs to stacked widget
         self.content_area.addWidget(self.home)
         self.content_area.addWidget(self.yoga_tab)
         self.content_area.addWidget(self.dashboard_tab)
         self.content_area.addWidget(self.settings_tab)
     
     def sidebar(self):
-        # Sidebar container
         sidebar = QFrame()
         sidebar.setStyleSheet("background-color: #013d54;border-radius: 10px;")
         sidebar_layout = QVBoxLayout(sidebar)
 
-        # Logo
         logo = QLabel()
         logo.setAlignment(Qt.AlignCenter)
         logo.setPixmap(QPixmap("assets/logo-transparent1.png").scaled(100, 50, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         logo.setStyleSheet("margin:15px 10px")
         sidebar_layout.addWidget(logo)
 
-        # Navigation buttons
         nav_buttons = [
             ("Home", "assets/home_icon.svg"),
             ("Yoga","assets/yoga_icon.svg"),
@@ -69,7 +63,6 @@ class PostureWatcherUI(QWidget):
         ]
         self.nav_button_dict = {}
 
-        # Active and inactive styles
         active_style = """
             QPushButton {
                 color: white;
@@ -93,7 +86,6 @@ class PostureWatcherUI(QWidget):
             }
         """
 
-        # Create navigation buttons
         for index, (text, icon_path) in enumerate(nav_buttons):
             button = QPushButton()
             button.setText(text)
@@ -138,11 +130,3 @@ class PostureWatcherUI(QWidget):
         self.MiniWindow.show()
         self.hide()
 
-def main():
-    app = QApplication(sys.argv)
-    mainWin = PostureWatcherUI()
-    mainWin.show()
-    sys.exit(app.exec())
-
-if __name__ == '__main__':
-    main()

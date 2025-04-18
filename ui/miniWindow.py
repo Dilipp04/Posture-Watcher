@@ -87,10 +87,3 @@ class MiniWindow(QWidget):
         self.mainWindow.show()
         self.hide()
 
-def main():
-    app = QApplication(sys.argv)
-    mini_window = MiniWindow()
-    mini_window.show()
-    sys.exit(app.exec())
-if __name__ == "__main__":
-    main()

@@ -21,9 +21,6 @@ class FrontPostureAnalyzer:
         self.base_posture = base_posture
 
     def run(self,camera_index=0):
-        """
-        Finds a pose, compares it to the base posture, and notifies the user if the deviation is above the threshold.
-        """
         self.cap = cv2.VideoCapture(camera_index)
         if not self.cap.isOpened():
             raise Exception("Error: Cannot access the webcam.")
@@ -33,9 +30,6 @@ class FrontPostureAnalyzer:
         self.fps = int(self.cap.get(cv2.CAP_PROP_FPS))
 
     def stop(self):
-        """
-        Stops Posture Watcher and destroys allocated resources.
-        """
         if self.cap:
             self.cap.release()
 
@@ -76,14 +70,7 @@ class FrontPostureAnalyzer:
 
         return image_bgr, posture_data
 
-    def _get_deviation_from_base_posture(self, algorithm_version: int = 2):
-        """
-        Calculates the deviation from the base posture as a percentage
-        :param algorithm_version: The algorithm version to use (int).
-                                   1: Uses body and face to calculate deviation
-                                   2: Uses only face to calculate deviation
-        :returns: float from 0-100, 100 being the most deviant from the base posture
-        """
+    def _get_deviation_from_base_posture(self, algorithm_version: int = 1):
         if self.base_posture is None:
             return None
 

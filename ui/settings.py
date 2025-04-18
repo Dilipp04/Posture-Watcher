@@ -182,14 +182,3 @@ class Settings(QWidget):
             self.state.update_setting(state_key, options[0])
 
         return container
-
-
-def main():
-    app = QApplication([])
-    window = Settings()
-    window.showMaximized()
-    app.exec()
-
-
-if __name__ == "__main__":
-    main()
